@@ -117,8 +117,6 @@ class Tests(unittest.TestCase):
 		gamma1, _ = model1.do_e_step(docs1, max_iter=100, gamma=initial_gamma)
 		time1 = time() - start
 
-		print time1 / time0
-
 		# make sure that C++ implementation is actually faster than Python version
 		self.assertLess(time1, time0,
 			msg='Inference step took longer ({0:.2f} s) than reference implementation ({1:.2f})'.format(time1, time0))

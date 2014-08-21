@@ -100,7 +100,8 @@ PyObject* OnlineLDA_lambda(OnlineLDAObject* self, void*) {
 	PyObject* array = PyArray_FromMatrixXd(self->lda->lambda());
 
 	// make array immutable
-	PyArray_CLEARFLAGS(reinterpret_cast<PyArrayObject*>(array), NPY_ARRAY_WRITEABLE);
+//	PyArray_CLEARFLAGS(reinterpret_cast<PyArrayObject*>(array), NPY_WRITEABLE);
+	reinterpret_cast<PyArrayObject*>(array)->flags &= ~NPY_WRITEABLE;
 
 	return array;
 }
@@ -108,7 +109,7 @@ PyObject* OnlineLDA_lambda(OnlineLDAObject* self, void*) {
 
 
 int OnlineLDA_set_lambda(OnlineLDAObject* self, PyObject* value, void*) {
-	value = PyArray_FROM_OTF(value, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+	value = PyArray_FROM_OTF(value, NPY_DOUBLE, NPY_IN_ARRAY);
 
 	if(!value) {
 		PyErr_SetString(PyExc_TypeError, "Lambda should be of type `ndarray`.");
@@ -259,7 +260,6 @@ int PyList_ToDocuments(PyObject* docs, void* documents_) {
 		documents = OnlineLDA::Documents(PyList_Size(docs));
 
 		// convert documents
-		#pragma omp parallel for
 		for(int i = 0; i < documents.size(); ++i) {
 			PyObject* doc = PyList_GetItem(docs, i);
 
@@ -310,7 +310,7 @@ PyObject* OnlineLDA_update_variables(
 
 	if(gamma) {
 		// make sure gamma is a NumPy array
-		gamma = PyArray_FROM_OTF(gamma, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+		gamma = PyArray_FROM_OTF(gamma, NPY_DOUBLE, NPY_IN_ARRAY);
 		if(!gamma) {
 			PyErr_SetString(PyExc_TypeError, "`gamma` should be of type `ndarray`.");
 			return 0;

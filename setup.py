@@ -41,6 +41,8 @@ modules = [
 		libraries=[] + libraries,
 		extra_compile_args=[
 				'-Wno-write-strings',
+				'-Wno-sign-compare',
+				'-Wno-unused-variable',
 			] + extra_compile_args)
 	]
 
