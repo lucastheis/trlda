@@ -1,0 +1,6 @@
+#ifndef MDLDA_UTILS_
+#define MDLDA_UTILS_
+
+#include "include/exception.h"
+
+#endif
