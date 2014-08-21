@@ -4,7 +4,7 @@ A fast implementation of mirror descent for latent dirichlet allocation.
 
 ## Requirements
 
-* Python >= 2.7.0
+* Python >= 2.7.3
 * NumPy >= 1.6.1
 
 I have tested the code with the above versions, but older versions might also work.
