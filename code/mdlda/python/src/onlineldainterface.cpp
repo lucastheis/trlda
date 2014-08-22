@@ -100,7 +100,6 @@ PyObject* OnlineLDA_lambda(OnlineLDAObject* self, void*) {
 	PyObject* array = PyArray_FromMatrixXd(self->lda->lambda());
 
 	// make array immutable
-//	PyArray_CLEARFLAGS(reinterpret_cast<PyArrayObject*>(array), NPY_WRITEABLE);
 	reinterpret_cast<PyArrayObject*>(array)->flags &= ~NPY_WRITEABLE;
 
 	return array;
