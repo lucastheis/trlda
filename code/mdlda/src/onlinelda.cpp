@@ -39,7 +39,7 @@ MDLDA::OnlineLDA::OnlineLDA(
 pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 		const Documents& documents,
 		int maxIter,
-		double threshold) const 
+		double threshold) const
 {
 	return updateVariables(
 		documents,
@@ -130,9 +130,15 @@ bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, int maxIter,
 	mLambda = ((1. - rho) * lambdaPrime).rowwise()
 		+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
 
+	pair<ArrayXXd, ArrayXXd> results;
+
 	// mirror descent iterations
 	for(int i = 0; i < maxIter; ++i) {
-		pair<ArrayXXd, ArrayXXd> results = updateVariables(documents);
+		if(i > 0)
+			// initialize with gamma of previous iteration
+			results = updateVariables(documents, results.first);
+		else
+			results = updateVariables(documents);
 
 		ArrayXXd& gamma = results.first;
 		ArrayXXd& sstats = results.second;

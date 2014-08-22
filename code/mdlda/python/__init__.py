@@ -1,4 +1,7 @@
 __version__ = '0.0.1a'
 
-#import models
-#import utils
+try:
+	import models
+	import utils
+except:
+	pass
