@@ -75,20 +75,15 @@ PyObject* OnlineLDA_num_documents(OnlineLDAObject* self, void*) {
 int OnlineLDA_set_num_documents(OnlineLDAObject* self, PyObject* value, void*) {
 	int num_documents = PyInt_AsLong(value);
 
-	if(PyErr_Occurred()) {
-		Py_DECREF(value);
+	if(PyErr_Occurred())
 		return -1;
-	}
 
 	try {
 		self->lda->setNumDocuments(num_documents);
 	} catch(Exception exception) {
-		Py_DECREF(value);
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
 	}
-
-	Py_DECREF(value);
 
 	return 0;
 }
@@ -139,20 +134,15 @@ PyObject* OnlineLDA_alpha(OnlineLDAObject* self, void*) {
 int OnlineLDA_set_alpha(OnlineLDAObject* self, PyObject* value, void*) {
 	double alpha = PyFloat_AsDouble(value);
 
-	if(PyErr_Occurred()) {
-		Py_DECREF(value);
+	if(PyErr_Occurred())
 		return -1;
-	}
 
 	try {
 		self->lda->setAlpha(alpha);
 	} catch(Exception exception) {
-		Py_DECREF(value);
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
 	}
-
-	Py_DECREF(value);
 
 	return 0;
 }
@@ -168,20 +158,15 @@ PyObject* OnlineLDA_eta(OnlineLDAObject* self, void*) {
 int OnlineLDA_set_eta(OnlineLDAObject* self, PyObject* value, void*) {
 	double eta = PyFloat_AsDouble(value);
 
-	if(PyErr_Occurred()) {
-		Py_DECREF(value);
+	if(PyErr_Occurred())
 		return -1;
-	}
 
 	try {
 		self->lda->setEta(eta);
 	} catch(Exception exception) {
-		Py_DECREF(value);
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
 	}
-
-	Py_DECREF(value);
 
 	return 0;
 }
@@ -197,20 +182,15 @@ PyObject* OnlineLDA_tau(OnlineLDAObject* self, void*) {
 int OnlineLDA_set_tau(OnlineLDAObject* self, PyObject* value, void*) {
 	double tau = PyFloat_AsDouble(value);
 
-	if(PyErr_Occurred()) {
-		Py_DECREF(value);
+	if(PyErr_Occurred())
 		return -1;
-	}
 
 	try {
 		self->lda->setTau(tau);
 	} catch(Exception exception) {
-		Py_DECREF(value);
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
 	}
-
-	Py_DECREF(value);
 
 	return 0;
 }
@@ -226,20 +206,15 @@ PyObject* OnlineLDA_kappa(OnlineLDAObject* self, void*) {
 int OnlineLDA_set_kappa(OnlineLDAObject* self, PyObject* value, void*) {
 	double kappa = PyFloat_AsDouble(value);
 
-	if(PyErr_Occurred()) {
-		Py_DECREF(value);
+	if(PyErr_Occurred())
 		return -1;
-	}
 
 	try {
 		self->lda->setKappa(kappa);
 	} catch(Exception exception) {
-		Py_DECREF(value);
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
 	}
-
-	Py_DECREF(value);
 
 	return 0;
 }
