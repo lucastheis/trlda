@@ -120,15 +120,20 @@ bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, int maxIter,
 
 	ArrayXXd lambdaPrime = mLambda;
 
-	// sufficient statistics if $\phi_{dwk}$ is 1/K
-	ArrayXd wordcounts = ArrayXd::Zero(numWords());
-	for(int i = 0; i < documents.size(); ++i)
-		for(int j = 0; j < documents[i].size(); ++j)
-			wordcounts[documents[i][j].first] += documents[i][j].second;
+	if(maxIter > 0) {
+		// sufficient statistics if $\phi_{dwk}$ is 1/K
+		ArrayXd wordcounts = ArrayXd::Zero(numWords());
+		for(int i = 0; i < documents.size(); ++i)
+			for(int j = 0; j < documents[i].size(); ++j)
+				wordcounts[documents[i][j].first] += documents[i][j].second;
 
-	// initial update to lambda to avoid local optima
-	mLambda = ((1. - rho) * lambdaPrime).rowwise()
-		+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+		// initial update to lambda to avoid local optima
+		mLambda = ((1. - rho) * lambdaPrime).rowwise()
+			+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+	} else {
+		// this way the update reduces to a SVI update
+		maxIter = 1;
+	}
 
 	pair<ArrayXXd, ArrayXXd> results;
 
