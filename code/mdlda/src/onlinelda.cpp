@@ -115,7 +115,12 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 
 
 bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, int maxIter, double rho) {
+	if(documents.size() == 0)
+		// nothing to be done
+		return true;
+
 	if(rho < 0.)
+		// automatically choose learning rate
 		rho = pow(mTau + mUpdateCounter, -mKappa);
 
 	ArrayXXd lambdaPrime = mLambda;

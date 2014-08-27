@@ -43,6 +43,14 @@ class Tests(unittest.TestCase):
 
 
 
+	def test_m_step(self):
+		model1 = OnlineLDA(num_words=100, num_topics=10, num_documents=1000)
+
+		# this used to cause a floating point exception
+		model1.update_parameters([])
+
+
+
 	def test_pickle(self):
 		model0 = OnlineLDA(
 			num_words=300,
