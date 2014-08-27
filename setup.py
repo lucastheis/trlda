@@ -28,8 +28,9 @@ modules = [
 				'code/mdlda/src/digamma.cpp',
 				'code/mdlda/src/utils.cpp',
 				'code/mdlda/python/src/module.cpp',
-				'code/mdlda/python/src/onlineldainterface.cpp',
 				'code/mdlda/python/src/distributioninterface.cpp',
+				'code/mdlda/python/src/onlineldainterface.cpp',
+				'code/mdlda/python/src/utilsinterface.cpp',
 				'code/mdlda/python/src/pyutils.cpp',
 			],
 		include_dirs=[

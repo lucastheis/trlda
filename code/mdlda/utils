@@ -2,5 +2,6 @@
 #define MDLDA_UTILS_
 
 #include "include/exception.h"
+#include "include/utils.h"
 
 #endif

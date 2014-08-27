@@ -7,7 +7,9 @@
 #include <sys/time.h>
 #include "distributioninterface.h"
 #include "onlineldainterface.h"
+#include "utilsinterface.h"
 #include "Eigen/Core"
+
 static PyGetSetDef Distribution_getset[] = {
 	{0}
 };
@@ -175,6 +177,7 @@ static const char* mdlda_doc =
 
 static PyMethodDef mdlda_methods[] = {
 	{"seed", (PyCFunction)seed, METH_VARARGS, 0},
+	{"random_select", (PyCFunction)random_select, METH_VARARGS | METH_KEYWORDS, random_select_doc},
 	{0}
 };
 
