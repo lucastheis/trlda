@@ -28,23 +28,25 @@ int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
 		"num_documents",
 		"alpha",
 		"eta",
-		"tau",
-		"kappa", 0};
+		"kappa_",
+		"tau_", 0};
 
 	int num_words;
 	int num_topics;
 	int num_documents;
 	double alpha = .1;
 	double eta = .3;
-	double tau = 1024.;
-	double kappa = .9;
+
+	// needed to support opening of older versions of pickled OnlineLDA objects
+	double kappa_ = 0.;
+	double tau_ = 0.;
 
 	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iii|dddd", const_cast<char**>(kwlist),
-			&num_words, &num_topics, &num_documents, &alpha, &eta, &tau, &kappa))
+			&num_words, &num_topics, &num_documents, &alpha, &eta, &kappa_, &tau_))
 		return -1;
 
 	try {
-		self->lda = new OnlineLDA(num_words, num_topics, num_documents, alpha, eta, tau, kappa);
+		self->lda = new OnlineLDA(num_words, num_topics, num_documents, alpha, eta);
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 	}
@@ -173,54 +175,6 @@ int OnlineLDA_set_eta(OnlineLDAObject* self, PyObject* value, void*) {
 
 
 
-PyObject* OnlineLDA_tau(OnlineLDAObject* self, void*) {
-	return PyFloat_FromDouble(self->lda->tau());
-}
-
-
-
-int OnlineLDA_set_tau(OnlineLDAObject* self, PyObject* value, void*) {
-	double tau = PyFloat_AsDouble(value);
-
-	if(PyErr_Occurred())
-		return -1;
-
-	try {
-		self->lda->setTau(tau);
-	} catch(Exception exception) {
-		PyErr_SetString(PyExc_RuntimeError, exception.message());
-		return -1;
-	}
-
-	return 0;
-}
-
-
-
-PyObject* OnlineLDA_kappa(OnlineLDAObject* self, void*) {
-	return PyFloat_FromDouble(self->lda->kappa());
-}
-
-
-
-int OnlineLDA_set_kappa(OnlineLDAObject* self, PyObject* value, void*) {
-	double kappa = PyFloat_AsDouble(value);
-
-	if(PyErr_Occurred())
-		return -1;
-
-	try {
-		self->lda->setKappa(kappa);
-	} catch(Exception exception) {
-		PyErr_SetString(PyExc_RuntimeError, exception.message());
-		return -1;
-	}
-
-	return 0;
-}
-
-
-
 int PyList_ToDocuments(PyObject* docs, void* documents_) {
 	OnlineLDA::Documents& documents = *reinterpret_cast<OnlineLDA::Documents*>(documents_);
 
@@ -274,12 +228,12 @@ PyObject* OnlineLDA_update_variables(
 	const char* kwlist[] = {"docs", "max_iter", "gamma", 0};
 
 	OnlineLDA::Documents documents;
-	int max_iter = 100;
+	OnlineLDA::Parameters parameters;
 	PyObject* gamma = 0;
 
 	// parse arguments
 	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iO", const_cast<char**>(kwlist),
-			&PyList_ToDocuments, &documents, &max_iter, &gamma))
+			&PyList_ToDocuments, &documents, &parameters.maxIterInference, &gamma))
 		return 0;
 
 	if(gamma) {
@@ -298,9 +252,9 @@ PyObject* OnlineLDA_update_variables(
 			results = self->lda->updateVariables(
 				documents,
 				PyArray_ToMatrixXd(gamma),
-				max_iter);
+				parameters);
 		else
-			results = self->lda->updateVariables(documents, max_iter);
+			results = self->lda->updateVariables(documents, parameters);
 
 		PyObject* rgamma = PyArray_FromMatrixXd(results.first);
 		PyObject* sstats = PyArray_FromMatrixXd(results.second);
@@ -332,20 +286,22 @@ PyObject* OnlineLDA_update_parameters(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "max_iter", "rho", 0};
+	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", 0};
 
 	OnlineLDA::Documents documents;
-	int max_iter = 20;
-	double rho = -1.;
-
+	OnlineLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|id", const_cast<char**>(kwlist),
-			&PyList_ToDocuments, &documents, &max_iter, &rho))
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iddd", const_cast<char**>(kwlist),
+			&PyList_ToDocuments, &documents,
+			&parameters.maxIterMD,
+			&parameters.kappa,
+			&parameters.tau,
+			&parameters.rho))
 		return 0;
 
 	try {
-		self->lda->updateParameters(documents, max_iter, rho);
+		self->lda->updateParameters(documents, parameters);
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 	}
@@ -363,14 +319,12 @@ const char* OnlineLDA_reduce_doc =
 
 PyObject* OnlineLDA_reduce(OnlineLDAObject* self, PyObject*) {
 	// constructor arguments
-	PyObject* args = Py_BuildValue("(iiidddd)",
+	PyObject* args = Py_BuildValue("(iiidd)",
 		self->lda->numWords(),
 		self->lda->numTopics(),
 		self->lda->numDocuments(),
 		self->lda->alpha(),
-		self->lda->eta(),
-		self->lda->tau(),
-		self->lda->kappa());
+		self->lda->eta());
 
 	PyObject* lambda = OnlineLDA_lambda(self, 0);
 	PyObject* state = Py_BuildValue("(Oi)", lambda, self->lda->updateCount());

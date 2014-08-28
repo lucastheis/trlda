@@ -16,19 +16,35 @@ using std::endl;
 #include <cmath>
 using std::pow;
 
+MDLDA::OnlineLDA::Parameters::Parameters(
+	InferenceMethod inferenceMethod,
+	double threshold,
+	int maxIterInference,
+	int maxIterMD,
+	double tau,
+	double kappa,
+	double rho) :
+	inferenceMethod(inferenceMethod),
+	threshold(threshold),
+	maxIterInference(maxIterInference),
+	maxIterMD(maxIterMD),
+	tau(tau),
+	kappa(kappa),
+	rho(rho)
+{
+}
+
+
+
 MDLDA::OnlineLDA::OnlineLDA(
 	int numWords,
 	int numTopics,
 	int numDocuments,
 	double alpha,
-	double eta,
-	double tau,
-	double kappa) :
+	double eta) :
 		mNumDocuments(numDocuments),
 		mAlpha(alpha),
 		mEta(eta),
-		mTau(tau),
-		mKappa(kappa),
 		mUpdateCounter(0)
 {
 	mLambda = sampleGamma(numTopics, numWords, 100) / 100.;
@@ -38,14 +54,13 @@ MDLDA::OnlineLDA::OnlineLDA(
 
 pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 		const Documents& documents,
-		int maxIter,
-		double threshold) const
+		const Parameters& parameters) const
 {
+	// initialize with random gamma
 	return updateVariables(
 		documents,
 		sampleGamma(numTopics(), documents.size(), 100) / 100.,
-		maxIter,
-		threshold);
+		parameters);
 }
 
 
@@ -53,8 +68,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 		const Documents& documents,
 		const ArrayXXd& initialGamma,
-		int maxIter,
-		double threshold) const
+		const Parameters& parameters) const
 {
 	if(initialGamma.rows() != numTopics() || initialGamma.cols() != documents.size())
 		throw Exception("Initial gamma has wrong dimensionality.");
@@ -76,7 +90,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 
 		ArrayXd phiNorm = (expPsiGamma.col(i).transpose() * expPsiLambdaDoc).array() + 1e-100;
 
-		for(int k = 0; k < maxIter; ++k) {
+		for(int k = 0; k < parameters.maxIterInference; ++k) {
 			ArrayXd lastGamma = gamma.col(i);
 
 			// recompute gamma, represent phi implicitly
@@ -92,7 +106,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 
 			phiNorm = (expPsiGamma.col(i).transpose() * expPsiLambdaDoc).array() + 1e-100;
 
-			if((lastGamma - gamma.col(i)).abs().mean() < threshold)
+			if((lastGamma - gamma.col(i)).abs().mean() < parameters.threshold)
 				break;
 		}
 
@@ -114,18 +128,19 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 
 
 
-bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, int maxIter, double rho) {
+bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Parameters& parameters) {
 	if(documents.size() == 0)
 		// nothing to be done
 		return true;
 
+	// choose a learning rate
+	double rho = parameters.rho;
 	if(rho < 0.)
-		// automatically choose learning rate
-		rho = pow(mTau + mUpdateCounter, -mKappa);
+		rho = pow(parameters.tau + mUpdateCounter, -parameters.kappa);
 
-	ArrayXXd lambdaPrime = mLambda;
+	if(parameters.maxIterMD > 0) {
+		ArrayXXd lambdaPrime = mLambda;
 
-	if(maxIter > 0) {
 		// sufficient statistics if $\phi_{dwk}$ is 1/K
 		ArrayXd wordcounts = ArrayXd::Zero(numWords());
 		for(int i = 0; i < documents.size(); ++i)
@@ -135,25 +150,30 @@ bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, int maxIter,
 		// initial update to lambda to avoid local optima
 		mLambda = ((1. - rho) * lambdaPrime).rowwise()
 			+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+
+		pair<ArrayXXd, ArrayXXd> results;
+
+		// mirror descent iterations
+		for(int i = 0; i < parameters.maxIterMD; ++i) {
+			// compute sufficient statistics (E-step)
+			if(i > 0)
+				// initialize with gamma of previous iteration
+				results = updateVariables(documents, results.first);
+			else
+				results = updateVariables(documents);
+			ArrayXXd& sstats = results.second;
+
+			// update parameters (M-step)
+			mLambda = (1. - rho) * lambdaPrime
+				+ rho * (mEta + mNumDocuments / documents.size() * sstats);
+		}
 	} else {
-		// this way the update reduces to a SVI update
-		maxIter = 1;
-	}
-
-	pair<ArrayXXd, ArrayXXd> results;
-
-	// mirror descent iterations
-	for(int i = 0; i < maxIter; ++i) {
-		if(i > 0)
-			// initialize with gamma of previous iteration
-			results = updateVariables(documents, results.first);
-		else
-			results = updateVariables(documents);
-
-		ArrayXXd& gamma = results.first;
+		// compute sufficient statistics (E-step)
+		pair<ArrayXXd, ArrayXXd> results = updateVariables(documents);
 		ArrayXXd& sstats = results.second;
 
-		mLambda = (1. - rho) * lambdaPrime
+		// update parameters (M-step)
+		mLambda = (1. - rho) * mLambda
 			+ rho * (mEta + mNumDocuments / documents.size() * sstats);
 	}
 

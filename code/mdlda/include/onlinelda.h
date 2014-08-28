@@ -20,14 +20,40 @@ namespace MDLDA {
 			typedef vector<Word> Document;
 			typedef vector<Document> Documents;
 
+			enum InferenceMethod {
+				VI, GIBBS, MAP
+			};
+
+			/**
+			 * Training parameters.
+			 */
+			struct Parameters {
+				public:
+					InferenceMethod inferenceMethod;
+					double threshold;
+					int maxIterInference;
+					int maxIterMD;
+					double tau;
+					double kappa;
+					double rho;
+
+					Parameters(
+						InferenceMethod inferenceMethod = VI,
+						double threshold = 0.001,
+						int maxIterInference = 100,
+						int maxIterMd = 20,
+						double tau = 1024.,
+						double kappa = .9,
+						double rho = -1.);
+			};
+
 			OnlineLDA(
 				int numWords,
 				int numTopics,
 				int numDocuments,
 				double alpha = .1,
-				double eta = .3,
-				double tau = 1024.,
-				double kappa = .9);
+				double eta = .3
+				);
 
 			inline int numTopics() const;
 			inline int numWords() const;
@@ -43,36 +69,25 @@ namespace MDLDA {
 			inline double eta() const;
 			inline void setEta(double eta);
 
-			inline double tau() const;
-			inline void setTau(double tau);
-
-			inline double kappa() const;
-			inline void setKappa(double kappa);
-
 			inline ArrayXXd lambda() const;
 			inline void setLambda(const ArrayXXd& lambda);
 
 			virtual pair<ArrayXXd, ArrayXXd> updateVariables(
 				const Documents& documents,
-				int maxIter = 100,
-				double threhsold = 0.001) const;
+				const Parameters& parameters = Parameters()) const;
 			virtual pair<ArrayXXd, ArrayXXd> updateVariables(
 				const Documents& documents,
 				const ArrayXXd& initialGamma,
-				int maxIter = 100,
-				double threshold = 0.001) const;
+				const Parameters& parameters = Parameters()) const;
 
 			virtual bool updateParameters(
 				const Documents& documents,
-				int maxIter = 20,
-				double rho = -1.);
+				const Parameters& parameters = Parameters());
 
 		private:
 			int mNumDocuments;
 			double mAlpha;
 			double mEta;
-			double mTau;
-			double mKappa;
 			ArrayXXd mLambda;
 			int mUpdateCounter;
 	};
@@ -132,34 +147,6 @@ inline void MDLDA::OnlineLDA::setEta(double eta) {
 	if(eta < 0.)
 		throw Exception("Eta should not be negative.");
 	mEta = eta;
-}
-
-
-
-inline double MDLDA::OnlineLDA::tau() const {
-	return mTau;
-}
-
-
-
-inline void MDLDA::OnlineLDA::setTau(double tau) {
-	if(tau < 0.)
-		throw Exception("Tau should not be negative.");
-	mTau = tau;
-}
-
-
-
-inline double MDLDA::OnlineLDA::kappa() const {
-	return mKappa;
-}
-
-
-
-inline void MDLDA::OnlineLDA::setKappa(double kappa) {
-	if(kappa < 0.)
-		throw Exception("Kappa should not be negative.");
-	mKappa = kappa;
 }
 
 

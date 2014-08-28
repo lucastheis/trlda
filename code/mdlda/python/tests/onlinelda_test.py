@@ -57,8 +57,6 @@ class Tests(unittest.TestCase):
 			num_topics=50,
 			num_documents=11110,
 			alpha=random.rand(),
-			tau=random.rand() * 1000.,
-			kappa=random.rand(),
 			eta=random.rand())
 
 		tmp_file = mkstemp()[1]
@@ -77,8 +75,6 @@ class Tests(unittest.TestCase):
 		self.assertEqual(model0.num_documents, model1.num_documents)
 		self.assertLess(max(abs(model0.lambdas - model1.lambdas)), 1e-20)
 		self.assertLess(abs(model0.alpha - model1.alpha), 1e-20)
-		self.assertLess(abs(model0.tau - model1.tau), 1e-20)
-		self.assertLess(abs(model0.kappa - model1.kappa), 1e-20)
 		self.assertLess(abs(model0.eta - model1.eta), 1e-20)
 
 
@@ -89,8 +85,6 @@ class Tests(unittest.TestCase):
 			num_topics=100,
 			num_documents=10000,
 			alpha=.1,
-			tau=1024.,
-			kappa=.9,
 			eta=.3)
 
 		# random vocabulary
@@ -102,8 +96,8 @@ class Tests(unittest.TestCase):
 			K=model1.num_topics,
 			alpha=model1.alpha,
 			eta=model1.eta,
-			kappa=model1.kappa,
-			tau0=model1.tau)
+			kappa=.9,
+			tau0=1024)
 
 		# generate D random documents of length up to N
 		D = 100

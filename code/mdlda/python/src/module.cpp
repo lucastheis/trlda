@@ -89,14 +89,6 @@ static PyGetSetDef OnlineLDA_getset[] = {
 		(getter)OnlineLDA_eta,
 		(setter)OnlineLDA_set_eta,
 		"Controls Dirichlet prior over topics, $\\beta_{ki}$."},
-	{"tau",
-		(getter)OnlineLDA_tau,
-		(setter)OnlineLDA_set_tau,
-		"Reduces the influence of the first steps by decreasing the learning rate."},
-	{"kappa",
-		(getter)OnlineLDA_kappa,
-		(setter)OnlineLDA_set_kappa,
-		"Controls how quickly the learning rate decreases."},
 	{0}
 };
 
