@@ -23,14 +23,16 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	int maxIterMD,
 	double tau,
 	double kappa,
-	double rho) :
+	double rho,
+	bool adaptive) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
 	maxIterMD(maxIterMD),
 	tau(tau),
 	kappa(kappa),
-	rho(rho)
+	rho(rho),
+	adaptive(adaptive)
 {
 }
 
@@ -48,6 +50,11 @@ MDLDA::OnlineLDA::OnlineLDA(
 		mUpdateCounter(0)
 {
 	mLambda = sampleGamma(numTopics, numWords, 100) / 100.;
+
+	mAdaTau = 1000.;
+	mAdaRho = 1. / mAdaTau;
+	mAdaSqNorm = 1.;
+	mAdaGradient = ArrayXXd::Zero(numTopics, numWords);
 }
 
 
@@ -128,19 +135,52 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariables(
 
 
 
-bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Parameters& parameters) {
+pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariablesGibbs(
+		const Documents& documents,
+		const ArrayXXd& initialTheta,
+		const Parameters& parameters) const
+{
+	if(initialTheta.rows() != numTopics() || initialTheta.cols() != documents.size())
+		throw Exception("Initial theta has wrong dimensionality.");
+
+	ArrayXXd theta = initialTheta;
+	ArrayXXd sstats = ArrayXXd::Zero(numTopics(), numWords());
+
+	// topics of words of documents
+	vector<vector<vector<int> > > topics;
+
+	// compute $\exp E[ \beta | \lambda ]$
+	ArrayXd psiSum = digamma(mLambda.rowwise().sum());
+	MatrixXd expPsiLambda = (digamma(mLambda).colwise() - psiSum).exp();
+
+	for(int i = 0; i < documents.size(); ++i) {
+		
+	}
+
+	return make_pair(theta, sstats);
+}
+
+
+
+double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Parameters& parameters) {
 	if(documents.size() == 0)
 		// nothing to be done
 		return true;
 
 	// choose a learning rate
 	double rho = parameters.rho;
-	if(rho < 0.)
-		rho = pow(parameters.tau + mUpdateCounter, -parameters.kappa);
+	if(rho < 0.) {
+		if(parameters.adaptive) {
+			rho = mAdaRho;
+		} else {
+			rho = pow(parameters.tau + mUpdateCounter, -parameters.kappa);
+		}
+	}
+
+	ArrayXXd lambdaPrime = mLambda;
+	ArrayXXd lambdaHat;
 
 	if(parameters.maxIterMD > 0) {
-		ArrayXXd lambdaPrime = mLambda;
-
 		// sufficient statistics if $\phi_{dwk}$ is 1/K
 		ArrayXd wordcounts = ArrayXd::Zero(numWords());
 		for(int i = 0; i < documents.size(); ++i)
@@ -164,8 +204,8 @@ bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Parame
 			ArrayXXd& sstats = results.second;
 
 			// update parameters (M-step)
-			mLambda = (1. - rho) * lambdaPrime
-				+ rho * (mEta + mNumDocuments / documents.size() * sstats);
+			lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+			mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 		}
 	} else {
 		// compute sufficient statistics (E-step)
@@ -173,11 +213,21 @@ bool MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Parame
 		ArrayXXd& sstats = results.second;
 
 		// update parameters (M-step)
-		mLambda = (1. - rho) * mLambda
-			+ rho * (mEta + mNumDocuments / documents.size() * sstats);
+		lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+		mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
+	}
+
+	if(parameters.adaptive) {
+		ArrayXXd lambdaUpdate = lambdaHat - lambdaPrime;
+
+		// compute running average of gradients and adjust learning rate
+		mAdaGradient = (1. - 1. / mAdaTau) * mAdaGradient + 1. / mAdaTau * lambdaUpdate;
+		mAdaSqNorm   = (1. - 1. / mAdaTau) * mAdaSqNorm   + 1. / mAdaTau * lambdaUpdate.matrix().squaredNorm();
+		mAdaRho = mAdaGradient.matrix().squaredNorm() / mAdaSqNorm;
+		mAdaTau = mAdaTau * (1. - mAdaRho) + 1.;
 	}
 
 	mUpdateCounter++;
 
-	return true;
+	return rho;
 }

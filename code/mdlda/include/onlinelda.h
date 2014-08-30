@@ -12,6 +12,7 @@ namespace MDLDA {
 	using std::pair;
 	using std::vector;
 
+	using Eigen::ArrayXi;
 	using Eigen::ArrayXXd;
 
 	class OnlineLDA : public Distribution {
@@ -36,6 +37,7 @@ namespace MDLDA {
 					double tau;
 					double kappa;
 					double rho;
+					bool adaptive;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -44,7 +46,8 @@ namespace MDLDA {
 						int maxIterMd = 20,
 						double tau = 1024.,
 						double kappa = .9,
-						double rho = -1.);
+						double rho = -1.,
+						bool adaptive = false);
 			};
 
 			OnlineLDA(
@@ -52,8 +55,7 @@ namespace MDLDA {
 				int numTopics,
 				int numDocuments,
 				double alpha = .1,
-				double eta = .3
-				);
+				double eta = .3);
 
 			inline int numTopics() const;
 			inline int numWords() const;
@@ -80,7 +82,12 @@ namespace MDLDA {
 				const ArrayXXd& initialGamma,
 				const Parameters& parameters = Parameters()) const;
 
-			virtual bool updateParameters(
+			virtual pair<ArrayXXd, ArrayXXd> updateVariablesGibbs(
+				const Documents& documents,
+				const ArrayXXd& initialTheta,
+				const Parameters& parameters = Parameters()) const;
+
+			virtual double updateParameters(
 				const Documents& documents,
 				const Parameters& parameters = Parameters());
 
@@ -90,6 +97,12 @@ namespace MDLDA {
 			double mEta;
 			ArrayXXd mLambda;
 			int mUpdateCounter;
+
+			// adaptive learning rate parameters (Ranganath et al., 2013)
+			double mAdaRho;
+			double mAdaTau;
+			double mAdaSqNorm;
+			ArrayXXd mAdaGradient;
 	};
 }
 

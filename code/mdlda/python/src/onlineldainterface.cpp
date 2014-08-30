@@ -286,28 +286,30 @@ PyObject* OnlineLDA_update_parameters(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", 0};
+	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", "adaptive", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iddd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|idddb", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxIterMD,
 			&parameters.kappa,
 			&parameters.tau,
-			&parameters.rho))
+			&parameters.rho,
+			&parameters.adaptive))
 		return 0;
 
 	try {
-		self->lda->updateParameters(documents, parameters);
+		// return learning rate used
+		return PyFloat_FromDouble(self->lda->updateParameters(documents, parameters));
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return 0;
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	return 0;
 }
 
 
