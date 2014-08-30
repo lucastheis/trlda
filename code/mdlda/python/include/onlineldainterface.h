@@ -35,12 +35,6 @@ int OnlineLDA_set_alpha(OnlineLDAObject*, PyObject*, void*);
 PyObject* OnlineLDA_eta(OnlineLDAObject*, void*);
 int OnlineLDA_set_eta(OnlineLDAObject*, PyObject*, void*);
 
-PyObject* OnlineLDA_tau(OnlineLDAObject*, void*);
-int OnlineLDA_set_tau(OnlineLDAObject*, PyObject*, void*);
-
-PyObject* OnlineLDA_kappa(OnlineLDAObject*, void*);
-int OnlineLDA_set_kappa(OnlineLDAObject*, PyObject*, void*);
-
 PyObject* OnlineLDA_update_parameters(OnlineLDAObject*, PyObject*, PyObject*);
 PyObject* OnlineLDA_update_variables(OnlineLDAObject*, PyObject*, PyObject*);
 
