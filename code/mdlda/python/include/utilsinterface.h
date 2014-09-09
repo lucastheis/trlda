@@ -10,7 +10,9 @@
 #include "pyutils.h"
 
 extern const char* random_select_doc;
+extern const char* sample_dirichlet_doc;
 
 PyObject* random_select(PyObject*, PyObject*, PyObject*);
+PyObject* sample_dirichlet(PyObject*, PyObject*, PyObject*);
 
 #endif

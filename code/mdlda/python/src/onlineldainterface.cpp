@@ -69,7 +69,7 @@ PyObject* OnlineLDA_num_words(OnlineLDAObject* self, void*) {
 
 
 PyObject* OnlineLDA_num_documents(OnlineLDAObject* self, void*) {
-	return PyFloat_FromDouble(self->lda->numDocuments());
+	return PyInt_FromLong(self->lda->numDocuments());
 }
 
 
@@ -225,53 +225,77 @@ PyObject* OnlineLDA_update_variables(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "max_iter", "gamma", 0};
+	const char* kwlist[] = {"docs", "latents", "inference_method", "max_iter", "num_samples", "burn_in", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
-	PyObject* gamma = 0;
+	PyObject* latents = 0;
+	const char* inference_method = 0;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iO", const_cast<char**>(kwlist),
-			&PyList_ToDocuments, &documents, &parameters.maxIterInference, &gamma))
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|Osiii", const_cast<char**>(kwlist),
+			&PyList_ToDocuments, &documents,
+			&latents,
+			&inference_method,
+			&parameters.maxIterInference,
+			&parameters.numSamples,
+			&parameters.burnIn))
 		return 0;
 
-	if(gamma) {
-		// make sure gamma is a NumPy array
-		gamma = PyArray_FROM_OTF(gamma, NPY_DOUBLE, NPY_IN_ARRAY);
-		if(!gamma) {
-			PyErr_SetString(PyExc_TypeError, "`gamma` should be of type `ndarray`.");
+	if(latents) {
+		// make sure latents is a NumPy array
+		latents = PyArray_FROM_OTF(latents, NPY_DOUBLE, NPY_IN_ARRAY);
+		if(!latents) {
+			PyErr_SetString(PyExc_TypeError, "`latents` should be of type `ndarray`.");
 			return 0;
+		}
+	}
+
+	if(inference_method) {
+		switch(inference_method[0]) {
+			case 'g':
+			case 'G':
+				parameters.inferenceMethod = OnlineLDA::GIBBS;
+				break;
+
+			case 'v':
+			case 'V':
+				parameters.inferenceMethod = OnlineLDA::VI;
+				break;
+
+			default:
+				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'gibbs' or 'vi'.");
+				return 0;
 		}
 	}
 
 	try {
 		pair<ArrayXXd, ArrayXXd> results;
 
-		if(gamma)
+		if(latents)
 			results = self->lda->updateVariables(
 				documents,
-				PyArray_ToMatrixXd(gamma),
+				PyArray_ToMatrixXd(latents),
 				parameters);
 		else
 			results = self->lda->updateVariables(documents, parameters);
 
-		PyObject* rgamma = PyArray_FromMatrixXd(results.first);
+		PyObject* rlatents = PyArray_FromMatrixXd(results.first);
 		PyObject* sstats = PyArray_FromMatrixXd(results.second);
-		PyObject* result = Py_BuildValue("(OO)", rgamma, sstats);
+		PyObject* result = Py_BuildValue("(OO)", rlatents, sstats);
 
-		Py_DECREF(rgamma);
+		Py_DECREF(rlatents);
 		Py_DECREF(sstats);
 
 		return result;
 
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
-		Py_XDECREF(gamma);
+		Py_XDECREF(latents);
 		return 0;
 	}
 
-	Py_XDECREF(gamma);
+	Py_XDECREF(latents);
 
 	return 0;
 }

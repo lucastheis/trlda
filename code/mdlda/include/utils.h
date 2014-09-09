@@ -11,6 +11,7 @@
 
 namespace MDLDA {
 	using Eigen::Array;
+	using Eigen::ArrayXd;
 	using Eigen::ArrayXXd;
 	using Eigen::ArrayXXi;
 	using Eigen::Dynamic;
@@ -39,7 +40,11 @@ namespace MDLDA {
 	ArrayXXd sinh(const ArrayXXd& arr);
 	ArrayXXd sech(const ArrayXXd& arr);
 
-//	ArrayXXd sampleNormal(int m = 1, int n = 1);
+	int sampleHistogram(const ArrayXd& histogram);
+	double sampleUniform();
+	ArrayXd sampleDirichlet(const ArrayXd& alpha);
+	ArrayXXd sampleDirichlet(int m = 1, int n = 1, double alpha = .1);
+	ArrayXXd sampleNormal(int m = 1, int n = 1);
 	ArrayXXd sampleGamma(int m = 1, int n = 1, int k = 1);
 	ArrayXXi samplePoisson(int m = 1, int n = 1, double lambda = 1.);
 	ArrayXXi samplePoisson(const ArrayXXd& lambda);

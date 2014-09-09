@@ -4,6 +4,7 @@
 #include "Eigen/Core"
 using Eigen::Dynamic;
 using Eigen::Array;
+using Eigen::ArrayXd;
 using Eigen::ArrayXXd;
 using Eigen::ArrayXXi;
 using Eigen::MatrixXd;
@@ -40,9 +41,10 @@ using std::sort;
 #include <limits>
 using std::numeric_limits;
 
-//#include <random>
-//using std::mt19937;
-//using std::normal_distribution;
+#include <random>
+using std::mt19937;
+using std::normal_distribution;
+using std::gamma_distribution;
 
 MatrixXd MDLDA::signum(const MatrixXd& matrix) {
 	return (matrix.array() > 0.).cast<double>() - (matrix.array() < 0.).cast<double>();
@@ -164,17 +166,38 @@ Array<double, 1, Dynamic> MDLDA::logMeanExp(const ArrayXXd& array) {
 
 
 
-//ArrayXXd MDLDA::sampleNormal(int m, int n) {
-// 	static mt19937 gen(rand());
-//
-//	normal_distribution<double> normal;
-//	ArrayXXd samples(m, n);
-//
-//	for(int i = 0; i < samples.size(); ++i)
-//		samples(i) = normal(gen);
-//
-//	return samples;
-//}
+int MDLDA::sampleHistogram(const ArrayXd& histogram) {
+	double r = sampleUniform() * histogram.sum();
+
+	for(int k = 0; k < histogram.size(); ++k) {
+		if(r < histogram[k])
+			return k;
+		r -= histogram[k];
+	}
+
+	throw Exception("Something went wrong while sampling from histogram.");
+}
+
+
+
+double MDLDA::sampleUniform() {
+	// return a number from the interval [0, 1[
+	return static_cast<double>(rand()) / (static_cast<long>(RAND_MAX) + 1l);
+}
+
+
+
+ArrayXXd MDLDA::sampleNormal(int m, int n) {
+ 	static mt19937 gen(rand());
+
+	normal_distribution<double> normal;
+	ArrayXXd samples(m, n);
+
+	for(int i = 0; i < samples.size(); ++i)
+		samples(i) = normal(gen);
+
+	return samples;
+}
 
 
 
@@ -185,6 +208,37 @@ ArrayXXd MDLDA::sampleGamma(int m, int n, int k) {
 		samples -= ArrayXXd::Random(m, n).abs().log();
 
 	return samples;
+}
+
+
+
+ArrayXd MDLDA::sampleDirichlet(const ArrayXd& alpha) {
+	static mt19937 gen(rand());
+
+	ArrayXd sample(alpha.size());
+
+	// sample from gamma distribution
+	for(int i = 0; i < sample.size(); ++i) {
+		gamma_distribution<double> distribution(alpha[i], 1.);
+		sample[i] = distribution(gen);
+	}
+
+	return sample / sample.sum();
+}
+
+
+
+ArrayXXd MDLDA::sampleDirichlet(int m, int n, double alpha) {
+	static mt19937 gen(rand());
+	gamma_distribution<double> distribution(alpha, 1.);
+
+	ArrayXXd sample(m, n);
+
+	// sample from gamma distribution
+	for(int i = 0; i < sample.size(); ++i)
+		sample(i) = distribution(gen);
+
+	return sample.rowwise() / sample.colwise().sum();
 }
 
 
@@ -266,7 +320,7 @@ ArrayXXi MDLDA::sampleBinomial(const ArrayXXi& n, const ArrayXXd& p) {
 		// very naive algorithm for generating binomial samples
 		for(int k = 0; k < n(i); ++k)
 			if(rand() / static_cast<double>(RAND_MAX) < p(i))
-				samples(i) += 1; 
+				samples(i) += 1;
 	}
 
 	return samples;

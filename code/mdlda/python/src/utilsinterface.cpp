@@ -3,9 +3,12 @@
 #include "mdlda/utils"
 using MDLDA::Exception;
 using MDLDA::randomSelect;
+using MDLDA::sampleDirichlet;
 
 #include <set>
 using std::set;
+
+#include "pyutils.h"
 
 const char* random_select_doc =
 	"random_select(k, n)\n"
@@ -41,6 +44,32 @@ PyObject* random_select(PyObject* self, PyObject* args, PyObject* kwds) {
 			PyList_SetItem(list, i, PyInt_FromLong(*iter));
 
 		return list;
+	} catch(Exception& exception) {
+		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return 0;
+	}
+	
+	return 0;
+}
+
+
+
+const char* sample_dirichlet_doc =
+	"";
+
+PyObject* sample_dirichlet(PyObject* self, PyObject* args, PyObject* kwds) {
+	const char* kwlist[] = {"m", "n", "alpha", 0};
+
+	int m;
+	int n;
+	double alpha;
+
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iid", const_cast<char**>(kwlist),
+		&m, &n, &alpha))
+		return 0;
+
+	try {
+		return PyArray_FromMatrixXd(sampleDirichlet(m, n, alpha));
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return 0;

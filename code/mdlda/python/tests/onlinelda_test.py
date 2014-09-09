@@ -10,7 +10,24 @@ from mdlda.models import OnlineLDA
 from onlineldavb import OnlineLDA as ReferenceLDA
 
 class Tests(unittest.TestCase):
-	def test_e_step(self):
+	def test_basics(self):
+		W = 102
+		D = 1010
+		K = 11
+		alpha = .27
+		eta = 3.1
+
+		model = OnlineLDA(num_words=W, num_topics=K, num_documents=D, alpha=alpha, eta=eta)
+
+		self.assertEqual(K, model.num_topics)
+		self.assertEqual(D, model.num_documents)
+		self.assertEqual(W, model.num_words)
+		self.assertEqual(alpha, model.alpha)
+		self.assertEqual(eta, model.eta)
+
+
+
+	def test_vi(self):
 		W = 100
 		K = 20
 		D = 10
@@ -35,11 +52,24 @@ class Tests(unittest.TestCase):
 		initial_gamma = random.gamma(100., 1./100., [K, D])
 
 		gamma0, sstats0 = model0.do_e_step(docs0, max_steps=50, gamma=initial_gamma.T)
-		gamma1, sstats1 = model1.do_e_step(docs1, max_iter=50, gamma=initial_gamma)
+		gamma1, sstats1 = model1.do_e_step(docs1, max_iter=50, latents=initial_gamma)
 
 		# make sure e-Step gives the same results
 		self.assertGreater(corrcoef(gamma0.T.ravel(), gamma1.ravel())[0, 1], 0.99)
 		self.assertGreater(corrcoef(sstats0.ravel(), sstats1.ravel())[0, 1], 0.99)
+
+
+
+	def test_gibbs(self):
+		model = OnlineLDA(num_words=100, num_topics=10, num_documents=1000)
+
+		# random documents
+		docs = []
+		for _ in range(model.num_documents):
+			docs.append([
+				(w, random.randint(10)) for w in random.permutation(model.num_words)[:1 + random.randint(100)]])
+
+		theta, sstats = model.update_variables(docs, inference_method='gibbs')
 
 
 
@@ -116,7 +146,7 @@ class Tests(unittest.TestCase):
 		time0 = time() - start
 
 		start = time()
-		gamma1, _ = model1.do_e_step(docs1, max_iter=100, gamma=initial_gamma)
+		gamma1, _ = model1.do_e_step(docs1, max_iter=100, latents=initial_gamma)
 		time1 = time() - start
 
 		# make sure that C++ implementation is actually faster than Python version

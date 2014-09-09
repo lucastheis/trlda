@@ -38,6 +38,8 @@ namespace MDLDA {
 					double kappa;
 					double rho;
 					bool adaptive;
+					int numSamples;
+					int burnIn;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -47,7 +49,9 @@ namespace MDLDA {
 						double tau = 1024.,
 						double kappa = .9,
 						double rho = -1.,
-						bool adaptive = false);
+						bool adaptive = false,
+						int numSamples = 1,
+						int burnIn = 2);
 			};
 
 			OnlineLDA(
@@ -79,9 +83,13 @@ namespace MDLDA {
 				const Parameters& parameters = Parameters()) const;
 			virtual pair<ArrayXXd, ArrayXXd> updateVariables(
 				const Documents& documents,
-				const ArrayXXd& initialGamma,
+				const ArrayXXd& latents,
 				const Parameters& parameters = Parameters()) const;
 
+			virtual pair<ArrayXXd, ArrayXXd> updateVariablesVI(
+				const Documents& documents,
+				const ArrayXXd& initialGamma,
+				const Parameters& parameters = Parameters()) const;
 			virtual pair<ArrayXXd, ArrayXXd> updateVariablesGibbs(
 				const Documents& documents,
 				const ArrayXXd& initialTheta,
@@ -109,7 +117,7 @@ namespace MDLDA {
 
 
 inline int MDLDA::OnlineLDA::numDocuments() const {
-	return mAlpha;
+	return mNumDocuments;
 }
 
 

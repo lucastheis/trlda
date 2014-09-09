@@ -1,8 +1,10 @@
 import sys
 import unittest
 
-from numpy import asarray, any
-from mdlda.utils import random_select
+from numpy import asarray, any, zeros, abs, max
+from numpy.random import dirichlet
+from scipy.stats import ks_2samp
+from mdlda.utils import random_select, sample_dirichlet
 
 class ToolsTest(unittest.TestCase):
 	def test_random_select(self):
@@ -23,6 +25,22 @@ class ToolsTest(unittest.TestCase):
 
 		# n should be larger than k
 		self.assertRaises(Exception, random_select, 10, 4)
+
+
+
+	def test_sample_dirichlet(self):
+		N = 100
+
+		for K in [2, 5, 10]:
+			for alpha in [.1, .5, 1., 4., 50.]:
+				samples0 = dirichlet(zeros(K) + alpha, size=[N]).T
+				samples1 = sample_dirichlet(K, N, alpha)
+
+
+				p = ks_2samp(samples0.ravel(), samples1.ravel())[1]
+
+				self.assertGreater(p, 1e-6)
+				self.assertLess(max(abs(1. - samples1.sum(0))), 1e-6)
 
 
 

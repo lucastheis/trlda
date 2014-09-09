@@ -14,10 +14,10 @@ from python import __version__
 
 if 'darwin' in sys.platform:
 	libraries = []
-	extra_compile_args = []
+	extra_compile_args = ['-std=c++0x', '-stdlib=libc++']
 else:
 	libraries = ['gomp']
-	extra_compile_args = ['-fopenmp']
+	extra_compile_args = ['-std=c++0x', '-fopenmp']
 
 modules = [
 	Extension('_mdlda',
