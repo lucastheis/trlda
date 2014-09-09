@@ -1,12 +1,13 @@
 try:
-	from scipy.stats import poisson
+	from numpy.random import poisson
 except:
 	pass
 
 def load_documents(filepath, batch_size=None, stochastic=False):
 	"""
 	Load documents from text file. If batch_size is given, behaves like a generator
-	and returns one batch at a time.
+	and returns one batch at a time. Each document is represented as a list of tuples,
+	where each tuple contains a word id and a word count.
 
 	@type  batch_size: C{int}
 	@param batch_size: the number of documents to return at once
@@ -23,7 +24,7 @@ def load_documents(filepath, batch_size=None, stochastic=False):
 		documents = []
 
 		# draw a possibly random number of documents
-		current_batch_size = poisson.rvs(batch_size) if stochastic else batch_size
+		current_batch_size = poisson(batch_size) if stochastic else batch_size
 
 		with open(filepath) as handle:
 			# each line is a document
@@ -39,7 +40,7 @@ def load_documents(filepath, batch_size=None, stochastic=False):
 				if batch_size:
 					while current_batch_size == 0:
 						yield []
-						current_batch_size = poisson.rvs(batch_size)
+						current_batch_size = poisson(batch_size)
 
 					if (lineno + 1) % current_batch_size == 0:
 						# batch is full, return documents
@@ -47,8 +48,8 @@ def load_documents(filepath, batch_size=None, stochastic=False):
 						documents = []
 
 						if stochastic:
-							# draw a new random batch_size
-							current_batch_size = poisson.rvs(batch_size)
+							# draw a new random batch size
+							current_batch_size = poisson(batch_size)
 
 
 		yield documents
