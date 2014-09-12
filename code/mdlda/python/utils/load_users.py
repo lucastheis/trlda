@@ -3,11 +3,16 @@ try:
 except:
 	pass
 
-def load_users(filepath, batch_size=None, stochastic=False):
+from collections import defaultdict
+
+def load_users(filepath, batch_size=None, stochastic=False, threshold=4):
 	"""
 	Load users from a text file. If `batch_size` is given, behaves like a generator
 	and returns one batch at a time. Each user is represented as a list of tuples,
 	where each tuple contains an item id and a rating.
+
+	@type  filepath: C{str}
+	@param filepath: path to file containing data
 
 	@type  batch_size: C{int}
 	@param batch_size: the number of users to return at once
@@ -31,6 +36,12 @@ def load_users(filepath, batch_size=None, stochastic=False):
 			for line in handle:
 				# load single user/item pair
 				uid, item, rating = (int(i) for i in line.split())
+
+				if threshold > 0:
+					if rating < threshold:
+						# skip item
+						continue
+					rating = 1
 
 				if uid != current_uid:
 					# end of user detected
@@ -60,6 +71,69 @@ def load_users(filepath, batch_size=None, stochastic=False):
 
 			if user:
 				users.append(user)
+				user = []
+
+		yield users
+
+	if batch_size:
+		return user_generator(filepath, batch_size)
+	return next(user_generator(filepath, batch_size))
+
+
+
+def load_users_as_dict(filepath, batch_size=None, stochastic=False, threshold=4):
+	"""
+	Like L{load_users}, but users are stored in a dictionary instead of a list.
+	The keys correspond to user IDs and the values are lists of item/rating pairs.
+	"""
+
+	def user_generator(filepath, batch_size):
+		user = []
+		users = {}
+		current_uid = None
+
+		# draw a possibly random number of users
+		current_batch_size = poisson(batch_size) if stochastic else batch_size
+
+		with open(filepath) as handle:
+			for line in handle:
+				# load single user/item pair
+				uid, item, rating = (int(i) for i in line.split())
+
+				if threshold > 0:
+					if rating < threshold:
+						# skip item
+						continue
+					rating = 1
+
+				if uid != current_uid:
+					# end of user detected
+					if user:
+						users[current_uid] = user
+
+						if batch_size:
+							while current_batch_size == 0:
+								yield []
+								current_batch_size = poisson(batch_size)
+
+							if len(users) >= current_batch_size:
+								# return batch of users
+								yield users
+								users = {}
+
+							if stochastic:
+								# draw a new random batch size
+								current_batch_size = poisson(batch_size)
+
+					# start new user
+					user = []
+					current_uid = uid
+
+				# add item to user
+				user.append((item, rating))
+
+			if user:
+				users[current_uid] = user
 				user = []
 
 		yield users

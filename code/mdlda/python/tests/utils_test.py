@@ -2,9 +2,11 @@ import sys
 import unittest
 
 from numpy import asarray, any, zeros, abs, max
-from numpy.random import dirichlet
+from numpy.random import dirichlet, binomial, randint, permutation
 from scipy.stats import ks_2samp
 from mdlda.utils import random_select, sample_dirichlet
+from mdlda.utils import load_users, load_users_as_dict
+from tempfile import mkstemp
 
 class ToolsTest(unittest.TestCase):
 	def test_random_select(self):
@@ -33,14 +35,53 @@ class ToolsTest(unittest.TestCase):
 
 		for K in [2, 5, 10]:
 			for alpha in [.1, .5, 1., 4., 50.]:
-				samples0 = dirichlet(zeros(K) + alpha, size=[N]).T
+				samples0 = dirichlet(zeros(K) + alpha, size=N).T
 				samples1 = sample_dirichlet(K, N, alpha)
-
 
 				p = ks_2samp(samples0.ravel(), samples1.ravel())[1]
 
 				self.assertGreater(p, 1e-6)
 				self.assertLess(max(abs(1. - samples1.sum(0))), 1e-6)
+
+
+
+	def test_load_users(self):
+		tmp_file = mkstemp()[1]
+
+		M = 10
+		B = 2
+		N = 100
+		p = .05
+		uids = permutation(1000)
+
+		# generate M random users
+		users = {uid: [(i + 1, randint(1, 6)) for i in permutation(N)[:binomial(N, p)]]
+			for uid in uids[:M]}
+
+		with open(tmp_file, 'w') as handle:
+			for uid in users:
+				for item, rating in users[uid]:
+					handle.write('{0} {1} {2}\n'.format(uid, item, rating))
+
+		threshold = 3
+
+		users_ = load_users_as_dict(tmp_file, threshold=threshold)
+
+		missing_users = set(users.keys()).difference(users_.keys())
+
+		# users should only be missing if all ratings are below threshold
+		for uid in missing_users:
+			for item, rating in users[uid]:
+				self.assertLess(rating, threshold)
+
+		# load users in batches
+		users_ = {}
+		for batch in load_users_as_dict(tmp_file, batch_size=B, threshold=0):
+			users_.update(batch)
+
+		# all users should be present since threshold is zero
+		for uid in users:
+			self.assertEqual(set(users_[uid]), set(users[uid]))
 
 
 
