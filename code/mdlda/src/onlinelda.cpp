@@ -26,7 +26,8 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	double rho,
 	bool adaptive,
 	int numSamples,
-	int burnIn) :
+	int burnIn,
+	double smoothing) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
@@ -36,7 +37,8 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	rho(rho),
 	adaptive(adaptive),
 	numSamples(numSamples),
-	burnIn(burnIn)
+	burnIn(burnIn),
+	smoothing(smoothing)
 {
 }
 
@@ -259,7 +261,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 	ArrayXXd lambdaHat;
 
 	if(parameters.maxIterMD > 0) {
-		// sufficient statistics if $\phi_{dwk}$ is 1/K
+		// sufficient statistics as if $\phi_{dwk}$ was 1/K
 		ArrayXd wordcounts = ArrayXd::Zero(numWords());
 		for(int i = 0; i < documents.size(); ++i)
 			for(int j = 0; j < documents[i].size(); ++j)
@@ -268,6 +270,10 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		// initial update to lambda to avoid local optima
 		mLambda = ((1. - rho) * lambdaPrime).rowwise()
 			+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+
+		if(parameters.smoothing > 0.)
+			// further reduce problems with local optima
+			mLambda += parameters.smoothing;
 
 		pair<ArrayXXd, ArrayXXd> results;
 
