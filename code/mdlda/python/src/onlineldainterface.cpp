@@ -225,14 +225,7 @@ PyObject* OnlineLDA_update_variables(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {
-		"docs",
-		"latents",
-		"inference_method",
-		"max_iter",
-		"num_samples",
-		"burn_in",
-		0};
+	const char* kwlist[] = {"docs", "latents", "inference_method", "max_iter", "num_samples", "burn_in", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
@@ -317,20 +310,19 @@ PyObject* OnlineLDA_update_parameters(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", "adaptive", "smoothing", 0};
+	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", "adaptive", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|idddbd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|idddb", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxIterMD,
 			&parameters.kappa,
 			&parameters.tau,
 			&parameters.rho,
-			&parameters.adaptive,
-			&parameters.smoothing))
+			&parameters.adaptive))
 		return 0;
 
 	try {

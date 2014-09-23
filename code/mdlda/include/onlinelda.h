@@ -40,7 +40,6 @@ namespace MDLDA {
 					bool adaptive;
 					int numSamples;
 					int burnIn;
-					double smoothing;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -52,8 +51,7 @@ namespace MDLDA {
 						double rho = -1.,
 						bool adaptive = false,
 						int numSamples = 1,
-						int burnIn = 2,
-						double smoothing = 0.);
+						int burnIn = 2);
 			};
 
 			OnlineLDA(
