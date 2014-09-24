@@ -267,7 +267,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 
 		// initial update to lambda to avoid local optima
 		mLambda = ((1. - rho) * lambdaPrime).rowwise()
-			+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+			+ rho * (mEta + static_cast<double>(mNumDocuments) / documents.size() / numTopics() * wordcounts.transpose());
 
 		pair<ArrayXXd, ArrayXXd> results;
 
@@ -282,7 +282,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 			ArrayXXd& sstats = results.second;
 
 			// update parameters (M-step)
-			lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+			lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 			mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 		}
 	} else {
@@ -291,7 +291,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		ArrayXXd& sstats = results.second;
 
 		// update parameters (M-step)
-		lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+		lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 		mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 	}
 
