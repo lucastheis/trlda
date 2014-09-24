@@ -145,6 +145,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariablesVI(
 
 			phiNorm = (expPsiGamma.col(i).transpose() * expPsiLambdaDoc).array() + 1e-100;
 
+			// test for convergence
 			if((lastGamma - gamma.col(i)).abs().mean() < parameters.threshold)
 				break;
 		}
@@ -259,7 +260,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 	ArrayXXd lambdaHat;
 
 	if(parameters.maxIterMD > 0) {
-		// sufficient statistics if $\phi_{dwk}$ is 1/K
+		// sufficient statistics as if $\phi_{dwk}$ was 1/K
 		ArrayXd wordcounts = ArrayXd::Zero(numWords());
 		for(int i = 0; i < documents.size(); ++i)
 			for(int j = 0; j < documents[i].size(); ++j)
@@ -267,7 +268,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 
 		// initial update to lambda to avoid local optima
 		mLambda = ((1. - rho) * lambdaPrime).rowwise()
-			+ rho * (mEta + mNumDocuments / documents.size() / numTopics() * wordcounts.transpose());
+			+ rho * (mEta + static_cast<double>(mNumDocuments) / documents.size() / numTopics() * wordcounts.transpose());
 
 		pair<ArrayXXd, ArrayXXd> results;
 
@@ -282,7 +283,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 			ArrayXXd& sstats = results.second;
 
 			// update parameters (M-step)
-			lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+			lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 			mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 		}
 	} else {
@@ -291,7 +292,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		ArrayXXd& sstats = results.second;
 
 		// update parameters (M-step)
-		lambdaHat = mEta + mNumDocuments / documents.size() * sstats;
+		lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 		mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 	}
 
