@@ -34,19 +34,44 @@ int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
 	int num_words;
 	int num_topics;
 	int num_documents;
-	double alpha = .1;
+	PyObject* alpha = 0;
 	double eta = .3;
 
-	// needed to support opening of older versions of pickled OnlineLDA objects
+	// needed to support opening of old versions of pickled OnlineLDA objects
 	double kappa_ = 0.;
 	double tau_ = 0.;
 
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iii|dddd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iii|Oddd", const_cast<char**>(kwlist),
 			&num_words, &num_topics, &num_documents, &alpha, &eta, &kappa_, &tau_))
 		return -1;
 
 	try {
-		self->lda = new OnlineLDA(num_words, num_topics, num_documents, alpha, eta);
+		if(alpha == 0) {
+			self->lda = new OnlineLDA(num_words, num_topics, num_documents, .1, eta);
+		} else if(PyFloat_Check(alpha)) {
+			self->lda = new OnlineLDA(num_words, num_topics, num_documents, PyFloat_AsDouble(alpha), eta);
+		} else if(PyInt_Check(alpha)) {
+			self->lda = new OnlineLDA(num_words, num_topics, num_documents, PyInt_AsLong(alpha), eta);
+		} else {
+			alpha = PyArray_FROM_OTF(alpha, NPY_DOUBLE, NPY_IN_ARRAY);
+
+			if(!alpha) {
+				PyErr_SetString(PyExc_TypeError, "Alpha should be of type `ndarray`.");
+				return -1;
+			}
+
+			MatrixXd alpha_ = PyArray_ToMatrixXd(alpha);
+
+			if(alpha_.rows() == 1)
+				alpha_ = alpha_.transpose();
+			if(alpha_.cols() != 1) {
+				PyErr_SetString(PyExc_TypeError, "Alpha should be one-dimensional.");
+				return -1;
+			}
+
+			self->lda = new OnlineLDA(num_words, num_documents, alpha_, eta);
+		}
+
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 	}
@@ -128,19 +153,36 @@ int OnlineLDA_set_lambda(OnlineLDAObject* self, PyObject* value, void*) {
 
 
 PyObject* OnlineLDA_alpha(OnlineLDAObject* self, void*) {
-	return PyFloat_FromDouble(self->lda->alpha());
+	return PyArray_FromMatrixXd(self->lda->alpha());
 }
 
 
 
-int OnlineLDA_set_alpha(OnlineLDAObject* self, PyObject* value, void*) {
-	double alpha = PyFloat_AsDouble(value);
-
-	if(PyErr_Occurred())
-		return -1;
-
+int OnlineLDA_set_alpha(OnlineLDAObject* self, PyObject* alpha, void*) {
 	try {
-		self->lda->setAlpha(alpha);
+		if(PyFloat_Check(alpha)) {
+			self->lda->setAlpha(PyFloat_AsDouble(alpha));
+		} else if(PyInt_Check(alpha)) {
+			self->lda->setAlpha(PyInt_AsLong(alpha));
+		} else {
+			alpha = PyArray_FROM_OTF(alpha, NPY_DOUBLE, NPY_IN_ARRAY);
+
+			if(!alpha) {
+				PyErr_SetString(PyExc_TypeError, "Alpha should be of type `ndarray`.");
+				return -1;
+			}
+
+			MatrixXd alpha_ = PyArray_ToMatrixXd(alpha);
+
+			if(alpha_.rows() == 1)
+				alpha_ = alpha_.transpose();
+			if(alpha_.cols() != 1) {
+				PyErr_SetString(PyExc_TypeError, "Alpha should be one-dimensional.");
+				return -1;
+			}
+
+			self->lda->setAlpha(alpha_);
+		}
 	} catch(Exception exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return -1;
@@ -345,13 +387,17 @@ const char* OnlineLDA_reduce_doc =
 	"Method used by Pickle.";
 
 PyObject* OnlineLDA_reduce(OnlineLDAObject* self, PyObject*) {
+	PyObject* alpha = PyArray_FromMatrixXd(self->lda->alpha());
+
 	// constructor arguments
-	PyObject* args = Py_BuildValue("(iiidd)",
+	PyObject* args = Py_BuildValue("(iiiOd)",
 		self->lda->numWords(),
 		self->lda->numTopics(),
 		self->lda->numDocuments(),
-		self->lda->alpha(),
+		alpha,
 		self->lda->eta());
+
+	Py_DECREF(alpha);
 
 	PyObject* lambda = OnlineLDA_lambda(self, 0);
 	PyObject* state = Py_BuildValue("(Oi)", lambda, self->lda->updateCount());

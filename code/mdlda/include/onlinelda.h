@@ -12,6 +12,7 @@ namespace MDLDA {
 	using std::pair;
 	using std::vector;
 
+	using Eigen::ArrayXd;
 	using Eigen::ArrayXi;
 	using Eigen::ArrayXXd;
 
@@ -62,6 +63,11 @@ namespace MDLDA {
 				int numDocuments,
 				double alpha = .1,
 				double eta = .3);
+			OnlineLDA(
+				int numWords,
+				int numDocuments,
+				ArrayXd alpha,
+				double eta = .3);
 
 			inline int numTopics() const;
 			inline int numWords() const;
@@ -71,8 +77,9 @@ namespace MDLDA {
 			inline int updateCount() const;
 			inline void setUpdateCount(int updateCount);
 
-			inline double alpha() const;
+			inline ArrayXd alpha() const;
 			inline void setAlpha(double alpha);
+			inline void setAlpha(const ArrayXd& alpha);
 
 			inline double eta() const;
 			inline void setEta(double eta);
@@ -103,7 +110,7 @@ namespace MDLDA {
 
 		private:
 			int mNumDocuments;
-			double mAlpha;
+			ArrayXd mAlpha;
 			double mEta;
 			ArrayXXd mLambda;
 			int mUpdateCounter;
@@ -140,13 +147,13 @@ inline int MDLDA::OnlineLDA::updateCount() const {
 
 inline void MDLDA::OnlineLDA::setUpdateCount(int updateCount) {
 	if(updateCount < 0)
-		throw Exception("The update count not be negative.");
+		throw Exception("The update count should not be negative.");
 	mUpdateCounter = updateCount;
 }
 
 
 
-inline double MDLDA::OnlineLDA::alpha() const {
+inline Eigen::ArrayXd MDLDA::OnlineLDA::alpha() const {
 	return mAlpha;
 }
 
@@ -155,6 +162,17 @@ inline double MDLDA::OnlineLDA::alpha() const {
 inline void MDLDA::OnlineLDA::setAlpha(double alpha) {
 	if(alpha < 0.)
 		throw Exception("Alpha should not be negative.");
+	mAlpha.setConstant(alpha);
+}
+
+
+
+inline void MDLDA::OnlineLDA::setAlpha(const ArrayXd& alpha) {
+	if(alpha.size() != numTopics())
+		throw Exception("Alpha has wrong dimensionality.");
+	for(int i = 0; i < alpha.size(); ++i)
+		if(alpha[i] < 0.)
+			throw Exception("Alpha should not be negative.");
 	mAlpha = alpha;
 }
 

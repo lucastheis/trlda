@@ -51,10 +51,32 @@ MDLDA::OnlineLDA::OnlineLDA(
 	double alpha,
 	double eta) :
 		mNumDocuments(numDocuments),
+		mEta(eta),
+		mUpdateCounter(0)
+{
+	mAlpha = ArrayXd::Constant(numTopics, alpha);
+	mLambda = sampleGamma(numTopics, numWords, 100) / 100.;
+
+	mAdaTau = 1000.;
+	mAdaRho = 1. / mAdaTau;
+	mAdaSqNorm = 1.;
+	mAdaGradient = ArrayXXd::Zero(numTopics, numWords);
+}
+
+
+
+MDLDA::OnlineLDA::OnlineLDA(
+	int numWords,
+	int numDocuments,
+	ArrayXd alpha,
+	double eta) :
+		mNumDocuments(numDocuments),
 		mAlpha(alpha),
 		mEta(eta),
 		mUpdateCounter(0)
 {
+	int numTopics = alpha.size();
+
 	mLambda = sampleGamma(numTopics, numWords, 100) / 100.;
 
 	mAdaTau = 1000.;
@@ -192,7 +214,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariablesGibbs(
 		vector<vector<int> > topics(documents[i].size());
 
 		// counts the occurrences of topics in this document (plus alpha)
-		ArrayXd counts = ArrayXd::Constant(numTopics(), mAlpha);
+		ArrayXd counts = mAlpha;
 
 		// initialize topics (blocked Gibbs sampling)
 		for(int j = 0; j < documents[i].size(); ++j) {
