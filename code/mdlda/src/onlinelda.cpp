@@ -26,7 +26,8 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	double rho,
 	bool adaptive,
 	int numSamples,
-	int burnIn) :
+	int burnIn,
+	bool initializeGamma) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
@@ -36,7 +37,8 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	rho(rho),
 	adaptive(adaptive),
 	numSamples(numSamples),
-	burnIn(burnIn)
+	burnIn(burnIn),
+	initGamma(initializeGamma)
 {
 }
 
@@ -275,7 +277,7 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		// mirror descent iterations
 		for(int i = 0; i < parameters.maxIterMD; ++i) {
 			// compute sufficient statistics (E-step)
-			if(i > 0)
+			if(i > 0 && parameters.initGamma)
 				// initialize with gamma of previous iteration
 				results = updateVariables(documents, results.first, parameters);
 			else
