@@ -104,6 +104,26 @@ ArrayXXd MDLDA::digamma(const ArrayXXd& arr) {
 
 
 
+double MDLDA::polygamma(int n, double x) {
+	if(n < 1)
+		return digamma(x);
+	return pow(-1, n + 1) * gamma(n + 1) * zeta(n + 1, x);
+}
+
+
+
+ArrayXXd MDLDA::polygamma(int n, const ArrayXXd& arr) {
+	ArrayXXd result(arr.rows(), arr.cols());
+
+	#pragma omp parallel for
+	for(int i = 0; i < arr.size(); ++i)
+		result(i) = polygamma(n, arr(i));
+
+	return result;
+}
+
+
+
 ArrayXXd MDLDA::tanh(const ArrayXXd& arr) {
 	ArrayXXd result(arr.rows(), arr.cols());
 

@@ -27,6 +27,7 @@ modules = [
 				'code/mdlda/src/distribution.cpp',
 				'code/mdlda/src/digamma.cpp',
 				'code/mdlda/src/utils.cpp',
+				'code/mdlda/src/zeta.cpp',
 				'code/mdlda/python/src/module.cpp',
 				'code/mdlda/python/src/distributioninterface.cpp',
 				'code/mdlda/python/src/onlineldainterface.cpp',
@@ -44,6 +45,7 @@ modules = [
 				'-Wno-write-strings',
 				'-Wno-sign-compare',
 				'-Wno-unused-variable',
+				'-Wno-#warnings',
 			] + extra_compile_args)
 	]
 

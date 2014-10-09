@@ -28,12 +28,15 @@ namespace MDLDA {
 
 	MatrixXd signum(const MatrixXd& matrix);
 
+	double zeta(double x, double q);
 	double gamma(double x);
 	double lngamma(double x);
 	ArrayXXd gamma(const ArrayXXd& arr);
 	ArrayXXd lngamma(const ArrayXXd& arr);
 	double digamma(double x);
 	ArrayXXd digamma(const ArrayXXd& arr);
+	double polygamma(int n, double x);
+	ArrayXXd polygamma(int n, const ArrayXXd& arr);
 
 	ArrayXXd tanh(const ArrayXXd& arr);
 	ArrayXXd cosh(const ArrayXXd& arr);

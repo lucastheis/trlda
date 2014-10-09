@@ -4,7 +4,7 @@ import unittest
 from numpy import asarray, any, zeros, abs, max
 from numpy.random import dirichlet, binomial, randint, permutation
 from scipy.stats import ks_2samp
-from mdlda.utils import random_select, sample_dirichlet
+from mdlda.utils import random_select, sample_dirichlet, polygamma
 from mdlda.utils import load_users, load_users_as_dict
 from tempfile import mkstemp
 
@@ -27,6 +27,23 @@ class ToolsTest(unittest.TestCase):
 
 		# n should be larger than k
 		self.assertRaises(Exception, random_select, 10, 4)
+
+
+
+	def test_polygamma(self):
+		# example values of the polygamma function
+		values = {
+			(0, .1): -10.423754940411,
+			(0, 1.): -0.5772156649015329,
+			(0, 120.): 4.7833192891185,
+			(1, .01): 10001.6212135283,
+			(1, .1): 101.433299150792758817215450106,
+			(1, .4): 7.275356590529597,
+			(1, 11.): 0.09516633568168575,
+			(2, 14.): -0.005479465690312488}
+
+		for (n, x), y in values.items():
+			self.assertAlmostEqual(y, polygamma(n, x))
 
 
 

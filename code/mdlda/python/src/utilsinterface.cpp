@@ -4,6 +4,7 @@
 using MDLDA::Exception;
 using MDLDA::randomSelect;
 using MDLDA::sampleDirichlet;
+using MDLDA::polygamma;
 
 #include <set>
 using std::set;
@@ -74,6 +75,55 @@ PyObject* sample_dirichlet(PyObject* self, PyObject* args, PyObject* kwds) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return 0;
 	}
-	
+
+	return 0;
+}
+
+
+
+const char* polygamma_doc =
+	"polygamma(n, x)\n"
+	"\n"
+	"The polygamma function.\n"
+	"\n"
+	"@type  n: C{int}\n"
+	"@param n: order of the polygamma function\n"
+	"\n"
+	"@type  x: C{ndarray}/C{float}\n"
+	"@param x: argument to the polygamma function\n"
+	"\n"
+	"@rtype: C{ndarray}/C{float}\n"
+	"@return: value of the polygamma function";
+
+PyObject* polygamma(PyObject* self, PyObject* args, PyObject* kwds) {
+	const char* kwlist[] = {"n", "x", 0};
+
+	PyObject* x;
+	int n;
+
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iO", const_cast<char**>(kwlist), &n, &x))
+		return 0;
+
+	try {
+		if(PyFloat_Check(x)) {
+			return PyFloat_FromDouble(polygamma(n, PyFloat_AsDouble(x)));
+		} else if(PyInt_Check(x)) {
+			return PyFloat_FromDouble(polygamma(n, PyInt_AsLong(x)));
+		} else {
+			x = PyArray_FROM_OTF(x, NPY_DOUBLE, NPY_IN_ARRAY);
+
+			if(!x) {
+				PyErr_SetString(PyExc_TypeError, "`x` should be of type `ndarray`.");
+				return 0;
+			}
+			PyObject* y = PyArray_FromMatrixXd(polygamma(n, PyArray_ToMatrixXd(x)));
+			Py_DECREF(x);
+			return y;
+		}
+	} catch(Exception& exception) {
+		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return 0;
+	}
+
 	return 0;
 }

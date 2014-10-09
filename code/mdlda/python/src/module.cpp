@@ -171,6 +171,7 @@ static PyMethodDef mdlda_methods[] = {
 	{"seed", (PyCFunction)seed, METH_VARARGS, 0},
 	{"random_select", (PyCFunction)random_select, METH_VARARGS | METH_KEYWORDS, random_select_doc},
 	{"sample_dirichlet", (PyCFunction)sample_dirichlet, METH_VARARGS | METH_KEYWORDS, sample_dirichlet_doc},
+	{"polygamma", (PyCFunction)polygamma, METH_VARARGS | METH_KEYWORDS, 0},
 	{0}
 };
 
