@@ -45,6 +45,11 @@ class ToolsTest(unittest.TestCase):
 		for (n, x), y in values.items():
 			self.assertAlmostEqual(y, polygamma(n, x))
 
+		x = asarray([.01, .1])
+		y = asarray([10001.6212135283, 101.433299150792758])
+
+		self.assertLess(max(abs(polygamma(1, x).ravel() - y)), 1e-7)
+
 
 
 	def test_sample_dirichlet(self):

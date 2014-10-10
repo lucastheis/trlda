@@ -13,6 +13,7 @@ using MDLDA::OnlineLDA;
 extern const char* OnlineLDA_doc;
 extern const char* OnlineLDA_update_parameters_doc;
 extern const char* OnlineLDA_update_variables_doc;
+extern const char* OnlineLDA_sample_doc;
 
 struct OnlineLDAObject {
 	PyObject_HEAD
@@ -34,6 +35,8 @@ int OnlineLDA_set_alpha(OnlineLDAObject*, PyObject*, void*);
 
 PyObject* OnlineLDA_eta(OnlineLDAObject*, void*);
 int OnlineLDA_set_eta(OnlineLDAObject*, PyObject*, void*);
+
+PyObject* OnlineLDA_sample(OnlineLDAObject*, PyObject*, PyObject*);
 
 PyObject* OnlineLDA_update_parameters(OnlineLDAObject*, PyObject*, PyObject*);
 PyObject* OnlineLDA_update_variables(OnlineLDAObject*, PyObject*, PyObject*);

@@ -7,6 +7,7 @@ from random import choice, randint
 from string import ascii_letters
 from numpy import corrcoef, random, abs, max, asarray, round
 from mdlda.models import OnlineLDA
+from mdlda.utils import sample_dirichlet
 from onlineldavb import OnlineLDA as ReferenceLDA
 
 class Tests(unittest.TestCase):
@@ -77,6 +78,7 @@ class Tests(unittest.TestCase):
 			docs.append([
 				(w, random.randint(10)) for w in random.permutation(model.num_words)[:1 + random.randint(100)]])
 
+		# make sure it doesn't segfault
 		theta, sstats = model.update_variables(docs, inference_method='gibbs')
 
 
@@ -86,6 +88,36 @@ class Tests(unittest.TestCase):
 
 		# this used to cause a floating point exception
 		model1.update_parameters([])
+
+
+
+	def test_empirical_bayes(self):
+		model = OnlineLDA(
+			num_words=4,
+			num_topics=2,
+			num_documents=1000,
+			alpha=[.2, .01],
+			eta=.2)
+
+		model.lambdas = [
+			[100, 100, 0, 0],
+			[0, 0, 100, 100]]
+
+		documents = model.sample(100, 10)
+
+		# set alpha to wrong values
+		model.alpha = [4., 4.]
+
+		for i in range(100):
+			model.update_parameters(documents, rho=0.1, update_alpha=True)
+			model.lambdas = [
+				[100, 100, 0, 0],
+				[0, 0, 100, 100]]
+
+		# make sure empirical Bayes went in the right direction
+		self.assertGreater(model.alpha[0], model.alpha[1])
+		self.assertLess(model.alpha[0], 4.)
+		self.assertLess(model.alpha[1], 4.)
 
 
 
@@ -117,7 +149,6 @@ class Tests(unittest.TestCase):
 
 
 
-	"""
 	def test_speed(self):
 		model1 = OnlineLDA(
 			num_words=1000,
@@ -161,7 +192,6 @@ class Tests(unittest.TestCase):
 		# make sure that C++ implementation is actually faster than Python version
 		self.assertLess(time1, time0,
 			msg='Inference step took longer ({0:.2f} s) than reference implementation ({1:.2f})'.format(time1, time0))
-	"""
 
 
 

@@ -259,6 +259,61 @@ int PyList_ToDocuments(PyObject* docs, void* documents_) {
 
 
 
+PyObject* PyList_FromDocuments(const OnlineLDA::Documents& documents) {
+	PyObject* documents_ = PyList_New(0);
+
+	for(int n = 0; n < documents.size(); ++n) {
+		PyObject* document = PyList_New(0);
+
+		for(int i = 0; i < documents[n].size(); ++i) {
+			const int& wordID = documents[n][i].first;
+			const int& wordCount = documents[n][i].second;
+
+			PyObject* tuple = Py_BuildValue("(ii)", wordID, wordCount);
+			PyList_Append(document, tuple);
+			Py_DECREF(tuple);
+		}
+
+		PyList_Append(documents_, document);
+		Py_DECREF(document);
+	}
+
+	return documents_;
+}
+
+
+
+const char* OnlineLDA_sample_doc =
+	"";
+
+PyObject* OnlineLDA_sample(
+	OnlineLDAObject* self,
+	PyObject* args,
+	PyObject* kwds)
+{
+	const char* kwlist[] = {"num_documents", "length", 0};
+
+	int num_documents;
+	int length;
+
+	// parse arguments
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "ii", const_cast<char**>(kwlist),
+			&num_documents, &length))
+		return 0;
+
+	try {
+		// return list of documents
+		return PyList_FromDocuments(self->lda->sample(num_documents, length));
+	} catch(Exception& exception) {
+		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return 0;
+	}
+
+	return 0;
+}
+
+
+
 const char* OnlineLDA_update_variables_doc =
 	"";
 
@@ -352,20 +407,31 @@ PyObject* OnlineLDA_update_parameters(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "max_iter", "kappa", "tau", "rho", "adaptive", "init_gamma", 0};
+	const char* kwlist[] = {
+		"docs",
+		"max_iter",
+		"kappa",
+		"tau",
+		"rho",
+		"adaptive",
+		"init_gamma",
+		"update_alpha",
+		"update_eta", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|idddbb", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|idddbbbb", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxIterMD,
 			&parameters.kappa,
 			&parameters.tau,
 			&parameters.rho,
 			&parameters.adaptive,
-			&parameters.initGamma))
+			&parameters.initGamma,
+			&parameters.updateAlpha,
+			&parameters.updateEta))
 		return 0;
 
 	try {

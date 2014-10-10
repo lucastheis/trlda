@@ -2,7 +2,13 @@
 using std::pair;
 using std::make_pair;
 
+#include <cmath>
+using std::pow;
+
 #include "Eigen/Core"
+using Eigen::Array;
+using Eigen::Dynamic;
+using Eigen::ArrayXi;
 using Eigen::ArrayXd;
 using Eigen::ArrayXXd;
 
@@ -12,9 +18,6 @@ using Eigen::ArrayXXd;
 #include <iostream>
 using std::cout;
 using std::endl;
-
-#include <cmath>
-using std::pow;
 
 MDLDA::OnlineLDA::Parameters::Parameters(
 	InferenceMethod inferenceMethod,
@@ -27,7 +30,9 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	bool adaptive,
 	int numSamples,
 	int burnIn,
-	bool initializeGamma) :
+	bool initializeGamma,
+	bool updateAlpha,
+	bool updateEta) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
@@ -38,7 +43,9 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	adaptive(adaptive),
 	numSamples(numSamples),
 	burnIn(burnIn),
-	initGamma(initializeGamma)
+	initGamma(initializeGamma),
+	updateAlpha(updateAlpha),
+	updateEta(updateEta)
 {
 }
 
@@ -83,6 +90,37 @@ MDLDA::OnlineLDA::OnlineLDA(
 	mAdaRho = 1. / mAdaTau;
 	mAdaSqNorm = 1.;
 	mAdaGradient = ArrayXXd::Zero(numTopics, numWords);
+}
+
+
+
+MDLDA::OnlineLDA::Documents MDLDA::OnlineLDA::sample(int numDocuments, double length) {
+	Documents documents;
+
+	// sample document lengths
+	ArrayXi lengths = samplePoisson(numDocuments, 1, length);
+
+	// sample beta
+	ArrayXXd beta(numTopics(), numWords());
+	for(int k = 0; k < numTopics(); ++k)
+		beta.row(k) = sampleDirichlet(mLambda.row(k).transpose()).transpose();
+
+	for(int n = 0; n < numDocuments; ++n) {
+		// sample theta
+		ArrayXd theta = sampleDirichlet(mAlpha);
+
+		// sample words
+		Document document;
+		for(int i = 0; i < lengths[n]; ++i) {
+			int k = sampleHistogram(theta);
+			int wordID = sampleHistogram(beta.row(k));
+			document.push_back(make_pair(wordID, 1));
+		}
+
+		documents.push_back(document);
+	}
+
+	return documents;
 }
 
 
@@ -283,6 +321,8 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 	ArrayXXd lambdaPrime = mLambda;
 	ArrayXXd lambdaHat;
 
+	pair<ArrayXXd, ArrayXXd> results;
+
 	if(parameters.maxIterMD > 0) {
 		// sufficient statistics as if $\phi_{dwk}$ was 1/K
 		ArrayXd wordcounts = ArrayXd::Zero(numWords());
@@ -293,8 +333,6 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		// initial update to lambda to avoid local optima
 		mLambda = ((1. - rho) * lambdaPrime).rowwise()
 			+ rho * (mEta + static_cast<double>(mNumDocuments) / documents.size() / numTopics() * wordcounts.transpose());
-
-		pair<ArrayXXd, ArrayXXd> results;
 
 		// mirror descent iterations
 		for(int i = 0; i < parameters.maxIterMD; ++i) {
@@ -312,12 +350,36 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		}
 	} else {
 		// compute sufficient statistics (E-step)
-		pair<ArrayXXd, ArrayXXd> results = updateVariables(documents, parameters);
+		results = updateVariables(documents, parameters);
 		ArrayXXd& sstats = results.second;
 
 		// update parameters (M-step)
 		lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 		mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
+	}
+
+	if(parameters.updateAlpha) {
+		// empirical Bayes update of alpha
+		ArrayXXd& gamma = results.first;
+
+		ArrayXXd psiGamma = digamma(gamma);
+		Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
+
+		// gradient of alpha
+		ArrayXd g = (psiGamma.rowwise() - psiGammaSum).rowwise().sum()
+			- documents.size() * (digamma(mAlpha) - digamma(mAlpha.sum()));
+
+		// components that make up Hessian
+		ArrayXd h = -static_cast<double>(documents.size()) * polygamma(1, mAlpha);
+		double z = documents.size() * polygamma(1, mAlpha.sum());
+		double c = (g / h).sum() / (1. / z + (1. / h).sum());
+
+		// perform natural gradient/Newton step
+		mAlpha = mAlpha - rho * (g - c) / h;
+
+		for(int i = 0; i < mAlpha.size(); ++i)
+			if(mAlpha[i] < 0.)
+				mAlpha[i] = 0.;
 	}
 
 	if(parameters.adaptive) {

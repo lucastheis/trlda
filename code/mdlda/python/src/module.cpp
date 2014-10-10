@@ -93,6 +93,10 @@ static PyGetSetDef OnlineLDA_getset[] = {
 };
 
 static PyMethodDef OnlineLDA_methods[] = {
+	{"sample",
+		(PyCFunction)OnlineLDA_sample,
+		METH_VARARGS | METH_KEYWORDS,
+		OnlineLDA_sample_doc},
 	{"update_parameters",
 		(PyCFunction)OnlineLDA_update_parameters,
 		METH_VARARGS | METH_KEYWORDS,

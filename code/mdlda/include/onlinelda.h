@@ -42,6 +42,8 @@ namespace MDLDA {
 					int numSamples;
 					int burnIn;
 					bool initGamma;
+					bool updateAlpha;
+					bool updateEta;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -54,7 +56,9 @@ namespace MDLDA {
 						bool adaptive = false,
 						int numSamples = 1,
 						int burnIn = 2,
-						bool initGamma = true);
+						bool initGamma = true,
+						bool updateAlpha = false,
+						bool updateEta = false);
 			};
 
 			OnlineLDA(
@@ -86,6 +90,8 @@ namespace MDLDA {
 
 			inline ArrayXXd lambda() const;
 			inline void setLambda(const ArrayXXd& lambda);
+
+			virtual Documents sample(int numDocuments, double length);
 
 			virtual pair<ArrayXXd, ArrayXXd> updateVariables(
 				const Documents& documents,
