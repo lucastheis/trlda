@@ -42,8 +42,11 @@ namespace MDLDA {
 					int numSamples;
 					int burnIn;
 					bool initGamma;
+					bool updateLambda;
 					bool updateAlpha;
 					bool updateEta;
+					double minAlpha;
+					double minEta;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -57,8 +60,11 @@ namespace MDLDA {
 						int numSamples = 1,
 						int burnIn = 2,
 						bool initGamma = true,
+						bool updateLambda = true,
 						bool updateAlpha = false,
-						bool updateEta = false);
+						bool updateEta = false,
+						double minAlpha = 1e-6,
+						double minEta = 1e-6);
 			};
 
 			OnlineLDA(

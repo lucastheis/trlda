@@ -31,8 +31,11 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	int numSamples,
 	int burnIn,
 	bool initializeGamma,
+	bool updateLambda,
 	bool updateAlpha,
-	bool updateEta) :
+	bool updateEta,
+	double minAlpha,
+	double minEta) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
@@ -44,8 +47,11 @@ MDLDA::OnlineLDA::Parameters::Parameters(
 	numSamples(numSamples),
 	burnIn(burnIn),
 	initGamma(initializeGamma),
+	updateLambda(updateLambda),
 	updateAlpha(updateAlpha),
-	updateEta(updateEta)
+	updateEta(updateEta),
+	minAlpha(minAlpha),
+	minEta(minEta)
 {
 }
 
@@ -184,7 +190,7 @@ pair<ArrayXXd, ArrayXXd> MDLDA::OnlineLDA::updateVariablesVI(
 
 	#pragma omp parallel for
 	for(int i = 0; i < documents.size(); ++i) {
-		// select columns needed for this document
+		// select columns (words) needed for this document
 		MatrixXd expPsiLambdaDoc(numTopics(), documents[i].size());
 		for(int j = 0; j < documents[i].size(); ++j)
 			expPsiLambdaDoc.col(j) = expPsiLambda.col(documents[i][j].first);
@@ -323,49 +329,61 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 
 	pair<ArrayXXd, ArrayXXd> results;
 
-	if(parameters.maxIterMD > 0) {
-		// sufficient statistics as if $\phi_{dwk}$ was 1/K
-		ArrayXd wordcounts = ArrayXd::Zero(numWords());
-		for(int i = 0; i < documents.size(); ++i)
-			for(int j = 0; j < documents[i].size(); ++j)
-				wordcounts[documents[i][j].first] += documents[i][j].second;
 
-		// initial update to lambda to avoid local optima
-		mLambda = ((1. - rho) * lambdaPrime).rowwise()
-			+ rho * (mEta + static_cast<double>(mNumDocuments) / documents.size() / numTopics() * wordcounts.transpose());
+	//// UPDATE LAMBDA
 
-		// mirror descent iterations
-		for(int i = 0; i < parameters.maxIterMD; ++i) {
+	if(parameters.updateLambda) {
+		if(parameters.maxIterMD > 0) {
+			// sufficient statistics as if $\phi_{dwk}$ was 1/K
+			ArrayXd wordcounts = ArrayXd::Zero(numWords());
+			for(int i = 0; i < documents.size(); ++i)
+				for(int j = 0; j < documents[i].size(); ++j)
+					wordcounts[documents[i][j].first] += documents[i][j].second;
+
+			// initial update to lambda to avoid local optima
+			mLambda = ((1. - rho) * lambdaPrime).rowwise()
+				+ rho * (mEta + static_cast<double>(mNumDocuments) / documents.size() / numTopics() * wordcounts.transpose());
+
+			// mirror descent iterations
+			for(int i = 0; i < parameters.maxIterMD; ++i) {
+				// compute sufficient statistics (E-step)
+				if(i > 0 && parameters.initGamma)
+					// initialize with gamma of previous iteration
+					results = updateVariables(documents, results.first, parameters);
+				else
+					results = updateVariables(documents, parameters);
+				ArrayXXd& sstats = results.second;
+
+				// update parameters (M-step)
+				lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
+				mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
+			}
+		} else {
 			// compute sufficient statistics (E-step)
-			if(i > 0 && parameters.initGamma)
-				// initialize with gamma of previous iteration
-				results = updateVariables(documents, results.first, parameters);
-			else
-				results = updateVariables(documents, parameters);
+			results = updateVariables(documents, parameters);
 			ArrayXXd& sstats = results.second;
 
 			// update parameters (M-step)
 			lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
 			mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 		}
-	} else {
-		// compute sufficient statistics (E-step)
-		results = updateVariables(documents, parameters);
-		ArrayXXd& sstats = results.second;
-
-		// update parameters (M-step)
-		lambdaHat = mEta + static_cast<double>(mNumDocuments) / documents.size() * sstats;
-		mLambda = (1. - rho) * lambdaPrime + rho * lambdaHat;
 	}
 
+
+	//// UPDATE ALPHA
+
 	if(parameters.updateAlpha) {
+		if(!parameters.updateLambda)
+			// estimate distribution over theta
+			results = updateVariables(documents, parameters);
+
 		// empirical Bayes update of alpha
 		ArrayXXd& gamma = results.first;
 
 		ArrayXXd psiGamma = digamma(gamma);
 		Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
 
-		// gradient of alpha
+		// gradient of lower bound with respect to alpha
 		ArrayXd g = (psiGamma.rowwise() - psiGammaSum).rowwise().sum()
 			- documents.size() * (digamma(mAlpha) - digamma(mAlpha.sum()));
 
@@ -374,15 +392,38 @@ double MDLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 		double z = documents.size() * polygamma(1, mAlpha.sum());
 		double c = (g / h).sum() / (1. / z + (1. / h).sum());
 
-		// perform natural gradient/Newton step
+		// perform stochastic natural gradient/Newton step
 		mAlpha = mAlpha - rho * (g - c) / h;
 
 		for(int i = 0; i < mAlpha.size(); ++i)
-			if(mAlpha[i] < 0.)
-				mAlpha[i] = 0.;
+			if(mAlpha[i] < parameters.minAlpha)
+				mAlpha[i] = parameters.minAlpha;
 	}
 
-	if(parameters.adaptive) {
+
+	//// UPDATE ETA
+
+	if(parameters.updateEta) {
+		// empirical Bayes update of eta
+		int K = numTopics();
+		int N = numWords();
+
+		// gradient of lower bound with respect to eta
+		double g = digamma(mLambda).sum() - N * digamma(mLambda.rowwise().sum()).sum()
+			- K * N * (digamma(mEta) - digamma(N * mEta));
+		double h = K * N * (polygamma(1, N * mEta) - polygamma(1, mEta));
+
+		// perform stochastic natural gradient/Newton step
+		mEta = mEta - rho * g / h;
+
+		if(mEta < parameters.minEta)
+			mEta = parameters.minEta;
+	}
+
+
+	//// ADJUST LEARNING RATES
+
+	if(parameters.updateLambda && parameters.adaptive) {
 		ArrayXXd lambdaUpdate = lambdaHat - lambdaPrime;
 
 		// compute running average of gradients and adjust learning rate

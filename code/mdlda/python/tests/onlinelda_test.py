@@ -5,7 +5,7 @@ from pickle import load, dump
 from tempfile import mkstemp
 from random import choice, randint
 from string import ascii_letters
-from numpy import corrcoef, random, abs, max, asarray, round
+from numpy import corrcoef, random, abs, max, asarray, round, zeros_like
 from mdlda.models import OnlineLDA
 from mdlda.utils import sample_dirichlet
 from onlineldavb import OnlineLDA as ReferenceLDA
@@ -91,7 +91,7 @@ class Tests(unittest.TestCase):
 
 
 
-	def test_empirical_bayes(self):
+	def test_empirical_bayes_alpha(self):
 		model = OnlineLDA(
 			num_words=4,
 			num_topics=2,
@@ -100,8 +100,8 @@ class Tests(unittest.TestCase):
 			eta=.2)
 
 		model.lambdas = [
-			[100, 100, 0, 0],
-			[0, 0, 100, 100]]
+			[100, 100, 1e-16, 1e-16],
+			[1e-16, 1e-16, 100, 100]]
 
 		documents = model.sample(100, 10)
 
@@ -109,15 +109,33 @@ class Tests(unittest.TestCase):
 		model.alpha = [4., 4.]
 
 		for i in range(100):
-			model.update_parameters(documents, rho=0.1, update_alpha=True)
-			model.lambdas = [
-				[100, 100, 0, 0],
-				[0, 0, 100, 100]]
+			model.update_parameters(documents, rho=.1, max_iter=0, update_lambda=False, update_alpha=True)
 
 		# make sure empirical Bayes went in the right direction
 		self.assertGreater(model.alpha[0], model.alpha[1])
 		self.assertLess(model.alpha[0], 4.)
 		self.assertLess(model.alpha[1], 4.)
+
+
+
+	def test_empirical_bayes_eta(self):
+		for eta, initial_eta in [(.045, .2), (.41, .2)]:
+			model = OnlineLDA(
+				num_words=100,
+				num_topics=10,
+				num_documents=500,
+				alpha=[.1, .1],
+				eta=initial_eta)
+
+			# this will sample a beta with the given eta
+			model.lambdas = zeros_like(model.lambdas) + eta
+			documents = model.sample(500, 10)
+
+			for i in range(50):
+				model.update_parameters(documents, rho=.1, update_eta=True)
+
+			# optimization should at least walk in the right direction and don't explode
+			self.assertLess(abs(model.eta - eta), abs(model.eta - initial_eta))
 
 
 
