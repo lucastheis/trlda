@@ -1,0 +1,7 @@
+#ifndef TRLDA_MODELS_
+#define TRLDA_MODELS_
+
+#include "include/distribution.h"
+#include "include/onlinelda.h"
+
+#endif

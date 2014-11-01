@@ -1,7 +1,0 @@
-#ifndef MDLDA_MODELS_
-#define MDLDA_MODELS_
-
-#include "include/distribution.h"
-#include "include/onlinelda.h"
-
-#endif

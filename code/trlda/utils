@@ -1,0 +1,7 @@
+#ifndef TRLDA_UTILS_
+#define TRLDA_UTILS_
+
+#include "include/exception.h"
+#include "include/utils.h"
+
+#endif
