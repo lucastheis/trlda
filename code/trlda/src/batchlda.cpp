@@ -75,9 +75,17 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 			Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
 			ArrayXXd psiGammaDiff = (psiGamma.rowwise() - psiGammaSum).rowwise().sum();
 
+			if(parameters.verbosity > 1)
+				cout << "Optimizing alpha..." << endl;
+
+			// lower bound module constants
+			double L = documents.size() * (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum())
+				+ (psiGammaDiff * (mAlpha - 1.)).sum();
+			double Lprime = L;
+
 			for(int i = 0; i < parameters.maxIterAlpha; ++i) {
-				double L = documents.size() * (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum())
-					+ (psiGammaDiff * (mAlpha - 1.)).sum();
+				if(parameters.verbosity > 1)
+					cout << "\tCurrent function value: " << L << endl;
 
 				// gradient of lower bound with respect to alpha
 				ArrayXd g = psiGammaDiff - documents.size() * (digamma(mAlpha) - digamma(mAlpha.sum()));
@@ -87,21 +95,34 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 				double z = documents.size() * polygamma(1, mAlpha.sum());
 				double c = (g / h).sum() / (1. / z + (1. / h).sum());
 
-				double rho = 1.;
+				double rho = .2;
 
+				// line search along natural gradient/Newton step
 				for(int j = 0; j < 20; ++j) {
-					// perform natural gradient/Newton step
 					ArrayXd alpha = mAlpha - rho * (g - c) / h;
 
+					// check for too small alphas
+					bool smallAlpha = false;
 					for(int i = 0; i < alpha.size(); ++i)
-						if(alpha[i] < parameters.minAlpha)
-							alpha[i] = parameters.minAlpha;
+						if(alpha[i] < parameters.minAlpha) {
+							smallAlpha = true;
+							break;
+						}
+					if(smallAlpha) {
+						rho /= 2.;
+						continue;
+					}
 
-					double Lprime = documents.size() * (lngamma(alpha.sum()) - lngamma(alpha).sum())
+					Lprime = documents.size() * (lngamma(alpha.sum()) - lngamma(alpha).sum())
 						+ (psiGammaDiff * (alpha - 1.)).sum();
 
 					if(L <= Lprime) {
-						// lower bound increased
+						if(parameters.verbosity > 1) {
+							cout << "\tStep width: " << rho << endl;
+							cout << "\tGradient magnitude: " << g.matrix().norm() << endl;
+						}
+
+						// lower bound has increased
 						mAlpha = alpha;
 						break;
 					}
@@ -109,6 +130,14 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 					// try again with smaller learning rate
 					rho /= 2.;
 				}
+
+				if(Lprime - L < parameters.empBayesThreshold)
+					// improvement was very small
+					break;
+
+				// update current function value
+				L = Lprime;
+
 			}
 		}
 
@@ -123,25 +152,41 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 			// constant independent of eta
 			double c = digamma(mLambda).sum() - N * digamma(mLambda.rowwise().sum()).sum();
 
+			if(parameters.verbosity > 1)
+				cout << "Optimizing eta..." << endl;
+
+			// lower bound modulo constants
+			double L = (mEta - 1) * c + K * lngamma(N * mEta) - K * N * lngamma(mEta);
+			double Lprime = L;
+
 			for(int i = 0; i < parameters.maxIterEta; ++i) {
-				// lower bound modulo constants
-				double L = (mEta - 1) * c + K * lngamma(N * mEta) - K * N * lngamma(mEta);
+				if(parameters.verbosity > 1)
+					cout << "\tCurrent function value: " << L << endl;
 
 				// gradient of lower bound with respect to eta
 				double g = c - K * N * (digamma(mEta) - digamma(N * mEta));
 				double h = K * N * (polygamma(1, N * mEta) - polygamma(1, mEta));
 
-				double rho = 1.;
+				double rho = .5;
 
-				// line search along gradient/Newton step
+				// line search along natural gradient/Newton step
 				for(int j = 0; j < 20; ++j) {
 					double eta = mEta - rho * g / h;
 
-					if(eta < parameters.minEta)
-						eta = parameters.minEta;
+					if(eta < parameters.minEta) {
+						rho /= 2.;
+						continue;
+					}
 
-					if(L <= (eta - 1) * c + K * lngamma(N * eta) - K * N * lngamma(eta)) {
-						// lower bound increased
+					Lprime = (eta - 1) * c + K * lngamma(N * eta) - K * N * lngamma(eta);
+
+					if(L <= Lprime) {
+						if(parameters.verbosity > 1) {
+							cout << "\tStep width: " << rho << endl;
+							cout << "\tGradient: " << g << endl;
+						}
+
+						// lower bound has increased
 						mEta = eta;
 						break;
 					}
@@ -149,6 +194,13 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 					// try again with smaller rho
 					rho /= 2.;
 				}
+
+				if(Lprime - L < parameters.empBayesThreshold)
+					// improvement was very small
+					break;
+
+				// current function value
+				L = Lprime;
 			}
 		}
 	}

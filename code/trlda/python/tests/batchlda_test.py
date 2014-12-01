@@ -38,19 +38,24 @@ class Tests(unittest.TestCase):
 		model = BatchLDA(
 			num_words=4,
 			num_topics=2,
-			alpha=[.2, .01],
+			alpha=[.2, .05],
 			eta=.2)
 
 		model.lambdas = [
 			[100, 100, 1e-16, 1e-16],
 			[1e-16, 1e-16, 100, 100]]
 
-		documents = model.sample(100, 10)
+		documents = model.sample(num_documents=100, length=20)
 
 		# set alpha to wrong values
 		model.alpha = [4., 4.]
 
-		model.update_parameters(documents, max_epochs=10, update_lambda=False, update_alpha=True)
+		model.update_parameters(documents,
+			max_epochs=10,
+			max_iter_inference=200,
+			update_lambda=False,
+			update_alpha=True,
+			emp_bayes_threshold=0.)
 
 		# make sure empirical Bayes went in the right direction
 		self.assertGreater(model.alpha[0], model.alpha[1])
@@ -71,7 +76,10 @@ class Tests(unittest.TestCase):
 			model.lambdas = zeros_like(model.lambdas) + eta
 			documents = model.sample(500, 10)
 
-			model.update_parameters(documents, max_epochs=10, update_eta=True)
+			model.update_parameters(documents, 
+				max_epochs=10,
+				update_eta=True,
+				emp_bayes_threshold=0.)
 
 			# optimization should at least walk in the right direction and don't explode
 			self.assertLess(abs(model.eta - eta), abs(model.eta - initial_eta))

@@ -31,7 +31,9 @@ TRLDA::LDA::Parameters::Parameters(
 	double minEta,
 	int maxEpochs,
 	int maxIterAlpha,
-	int maxIterEta) :
+	int maxIterEta,
+	double empBayesThreshold,
+	int verbosity) :
 	inferenceMethod(inferenceMethod),
 	threshold(threshold),
 	maxIterInference(maxIterInference),
@@ -50,7 +52,9 @@ TRLDA::LDA::Parameters::Parameters(
 	minEta(minEta),
 	maxEpochs(maxEpochs),
 	maxIterAlpha(maxIterAlpha),
-	maxIterEta(maxIterEta)
+	maxIterEta(maxIterEta),
+	empBayesThreshold(empBayesThreshold),
+	verbosity(verbosity)
 {
 }
 

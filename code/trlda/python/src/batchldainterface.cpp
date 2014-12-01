@@ -90,13 +90,15 @@ PyObject* BatchLDA_update_parameters(
 		"update_alpha",
 		"update_eta",
 		"min_alpha",
-		"min_eta", 0};
+		"min_eta",
+		"emp_bayes_threshold",
+		"verbosity", 0};
 
 	BatchLDA::Documents documents;
 	BatchLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iiiibbbdd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iiiibbbdddi", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxEpochs,
 			&parameters.maxIterInference,
@@ -106,7 +108,9 @@ PyObject* BatchLDA_update_parameters(
 			&parameters.updateAlpha,
 			&parameters.updateEta,
 			&parameters.minAlpha,
-			&parameters.minEta))
+			&parameters.minEta,
+			&parameters.empBayesThreshold,
+			&parameters.verbosity))
 		return 0;
 
 	try {

@@ -126,13 +126,14 @@ PyObject* OnlineLDA_update_parameters(
 		"update_alpha",
 		"update_eta",
 		"min_alpha",
-		"min_eta", 0};
+		"min_eta",
+		"verbosity", 0};
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iidddbbbbbdd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iidddbbbbbddi", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxIterTR,
 			&parameters.maxIterInference,
@@ -145,7 +146,8 @@ PyObject* OnlineLDA_update_parameters(
 			&parameters.updateAlpha,
 			&parameters.updateEta,
 			&parameters.minAlpha,
-			&parameters.minEta))
+			&parameters.minEta,
+			&parameters.verbosity))
 		return 0;
 
 	try {

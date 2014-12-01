@@ -50,6 +50,8 @@ namespace TRLDA {
 					int maxEpochs;
 					int maxIterAlpha;
 					int maxIterEta;
+					double empBayesThreshold;
+					int verbosity;
 
 					Parameters(
 						InferenceMethod inferenceMethod = VI,
@@ -70,7 +72,9 @@ namespace TRLDA {
 						double minEta = 1e-6,
 						int maxEpochs = 100,
 						int maxIterAlpha = 10,
-						int maxIterEta = 20);
+						int maxIterEta = 20,
+						double empBayesThreshold = 1e-8,
+						int verbosity = 0);
 			};
 
 			LDA(
