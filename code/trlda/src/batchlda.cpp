@@ -1,0 +1,157 @@
+#include <utility>
+using std::pair;
+using std::make_pair;
+
+#include <cmath>
+using std::pow;
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+#include "Eigen/Core"
+using Eigen::Array;
+using Eigen::Dynamic;
+using Eigen::ArrayXi;
+using Eigen::ArrayXd;
+using Eigen::ArrayXXd;
+
+#include "batchlda.h"
+#include "utils.h"
+
+TRLDA::BatchLDA::BatchLDA(
+	int numWords,
+	int numTopics,
+	double alpha,
+	double eta) :
+		LDA(numWords, numTopics, alpha, eta)
+{
+}
+
+
+
+TRLDA::BatchLDA::BatchLDA(
+	int numWords,
+	ArrayXd alpha,
+	double eta) :
+		LDA(numWords, alpha, eta)
+{
+}
+
+
+
+double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Parameters& parameters) {
+	if(documents.size() == 0)
+		// nothing to be done
+		return true;
+
+	for(int epoch = 0; epoch < parameters.maxEpochs; ++epoch) {
+		pair<ArrayXXd, ArrayXXd> results;
+
+
+		//// UPDATE LAMBDA
+
+		if(parameters.updateLambda) {
+			// compute sufficient statistics (E-step)
+			results = updateVariables(documents, parameters);
+			ArrayXXd& sstats = results.second;
+
+			// update parameters (M-step)
+			mLambda = mEta + sstats;
+		}
+
+
+		//// UPDATE ALPHA
+
+		if(parameters.updateAlpha) {
+			if(!parameters.updateLambda)
+				// estimate distribution over theta
+				results = updateVariables(documents, parameters);
+
+			// empirical Bayes update of alpha
+			ArrayXXd& gamma = results.first;
+
+			ArrayXXd psiGamma = digamma(gamma);
+			Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
+			ArrayXXd psiGammaDiff = (psiGamma.rowwise() - psiGammaSum).rowwise().sum();
+
+			for(int i = 0; i < parameters.maxIterAlpha; ++i) {
+				double L = documents.size() * (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum())
+					+ (psiGammaDiff * (mAlpha - 1.)).sum();
+
+				// gradient of lower bound with respect to alpha
+				ArrayXd g = psiGammaDiff - documents.size() * (digamma(mAlpha) - digamma(mAlpha.sum()));
+
+				// components that make up Hessian
+				ArrayXd h = -static_cast<double>(documents.size()) * polygamma(1, mAlpha);
+				double z = documents.size() * polygamma(1, mAlpha.sum());
+				double c = (g / h).sum() / (1. / z + (1. / h).sum());
+
+				double rho = 1.;
+
+				for(int j = 0; j < 20; ++j) {
+					// perform natural gradient/Newton step
+					ArrayXd alpha = mAlpha - rho * (g - c) / h;
+
+					for(int i = 0; i < alpha.size(); ++i)
+						if(alpha[i] < parameters.minAlpha)
+							alpha[i] = parameters.minAlpha;
+
+					double Lprime = documents.size() * (lngamma(alpha.sum()) - lngamma(alpha).sum())
+						+ (psiGammaDiff * (alpha - 1.)).sum();
+
+					if(L <= Lprime) {
+						// lower bound increased
+						mAlpha = alpha;
+						break;
+					}
+
+					// try again with smaller learning rate
+					rho /= 2.;
+				}
+			}
+		}
+
+
+		//// UPDATE ETA
+
+		if(parameters.updateEta) {
+			// empirical Bayes update of eta
+			int K = numTopics();
+			int N = numWords();
+
+			// constant independent of eta
+			double c = digamma(mLambda).sum() - N * digamma(mLambda.rowwise().sum()).sum();
+
+			for(int i = 0; i < parameters.maxIterEta; ++i) {
+				// lower bound modulo constants
+				double L = (mEta - 1) * c + K * lngamma(N * mEta) - K * N * lngamma(mEta);
+
+				// gradient of lower bound with respect to eta
+				double g = c - K * N * (digamma(mEta) - digamma(N * mEta));
+				double h = K * N * (polygamma(1, N * mEta) - polygamma(1, mEta));
+
+				double rho = 1.;
+
+				// line search along gradient/Newton step
+				for(int j = 0; j < 20; ++j) {
+					double eta = mEta - rho * g / h;
+
+					if(eta < parameters.minEta)
+						eta = parameters.minEta;
+
+					if(L <= (eta - 1) * c + K * lngamma(N * eta) - K * N * lngamma(eta)) {
+						// lower bound increased
+						mEta = eta;
+						break;
+					}
+
+					// try again with smaller rho
+					rho /= 2.;
+				}
+			}
+		}
+	}
+
+	return 1.;
+}

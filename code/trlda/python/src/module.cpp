@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include "distributioninterface.h"
+#include "ldainterface.h"
 #include "onlineldainterface.h"
+#include "batchldainterface.h"
 #include "utilsinterface.h"
 #include "Eigen/Core"
 
@@ -60,55 +62,105 @@ PyTypeObject Distribution_type = {
 	Distribution_new,                     /*tp_new*/
 };
 
-static PyGetSetDef OnlineLDA_getset[] = {
+static PyGetSetDef LDA_getset[] = {
 	{"num_topics",
-		(getter)OnlineLDA_num_topics,
+		(getter)LDA_num_topics,
 		0,
 		"Number of topics."},
 	{"num_words",
-		(getter)OnlineLDA_num_words,
+		(getter)LDA_num_words,
 		0,
 		"Number of words."},
-	{"num_documents",
-		(getter)OnlineLDA_num_documents,
-		(setter)OnlineLDA_set_num_documents,
-		"Number of documents of the (hypothetical) full dataset."},
 	{"lambdas",
-		(getter)OnlineLDA_lambda,
-		(setter)OnlineLDA_set_lambda,
+		(getter)LDA_lambda,
+		(setter)LDA_set_lambda,
 		"Parameters governing beliefs over topics, $\\beta_{ki}$."},
 	{"_lambda",
-		(getter)OnlineLDA_lambda,
-		(setter)OnlineLDA_set_lambda,
+		(getter)LDA_lambda,
+		(setter)LDA_set_lambda,
 		"Alias for C{lambdas}."},
 	{"alpha",
-		(getter)OnlineLDA_alpha,
-		(setter)OnlineLDA_set_alpha,
+		(getter)LDA_alpha,
+		(setter)LDA_set_alpha,
 		"Controls Dirichlet prior over topic weights, $\\theta_k$."},
 	{"eta",
-		(getter)OnlineLDA_eta,
-		(setter)OnlineLDA_set_eta,
+		(getter)LDA_eta,
+		(setter)LDA_set_eta,
 		"Controls Dirichlet prior over topics, $\\beta_{ki}$."},
 	{0}
 };
 
-static PyMethodDef OnlineLDA_methods[] = {
+static PyMethodDef LDA_methods[] = {
 	{"sample",
-		(PyCFunction)OnlineLDA_sample,
+		(PyCFunction)LDA_sample,
 		METH_VARARGS | METH_KEYWORDS,
-		OnlineLDA_sample_doc},
+		LDA_sample_doc},
+	{"update_variables",
+		(PyCFunction)LDA_update_variables,
+		METH_VARARGS | METH_KEYWORDS,
+		LDA_update_variables_doc},
+	{"do_e_step",
+		(PyCFunction)LDA_update_variables,
+		METH_VARARGS | METH_KEYWORDS,
+		"Alias for C{update_variables}."},
+	{0}
+};
+
+PyTypeObject LDA_type = {
+	PyObject_HEAD_INIT(0)
+	0,                                /*ob_size*/
+	"trlda.models.LDA",               /*tp_name*/
+	sizeof(LDAObject),                /*tp_basicsize*/
+	0,                                /*tp_itemsize*/
+	(destructor)Distribution_dealloc, /*tp_dealloc*/
+	0,                                /*tp_print*/
+	0,                                /*tp_getattr*/
+	0,                                /*tp_setattr*/
+	0,                                /*tp_compare*/
+	0,                                /*tp_repr*/
+	0,                                /*tp_as_number*/
+	0,                                /*tp_as_sequence*/
+	0,                                /*tp_as_mapping*/
+	0,                                /*tp_hash */
+	0,                                /*tp_call*/
+	0,                                /*tp_str*/
+	0,                                /*tp_getattro*/
+	0,                                /*tp_setattro*/
+	0,                                /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
+	LDA_doc,                          /*tp_doc*/
+	0,                                /*tp_traverse*/
+	0,                                /*tp_clear*/
+	0,                                /*tp_richcompare*/
+	0,                                /*tp_weaklistoffset*/
+	0,                                /*tp_iter*/
+	0,                                /*tp_iternext*/
+	LDA_methods,                      /*tp_methods*/
+	0,                                /*tp_members*/
+	LDA_getset,                       /*tp_getset*/
+	&Distribution_type,               /*tp_base*/
+	0,                                /*tp_dict*/
+	0,                                /*tp_descr_get*/
+	0,                                /*tp_descr_set*/
+	0,                                /*tp_dictoffset*/
+	(initproc)LDA_init,               /*tp_init*/
+	0,                                /*tp_alloc*/
+	Distribution_new,                 /*tp_new*/
+};
+
+static PyGetSetDef OnlineLDA_getset[] = {
+	{"num_documents",
+		(getter)OnlineLDA_num_documents,
+		(setter)OnlineLDA_set_num_documents,
+		"Number of documents of the (hypothetical) full dataset."},
+	{0}
+};
+
+static PyMethodDef OnlineLDA_methods[] = {
 	{"update_parameters",
 		(PyCFunction)OnlineLDA_update_parameters,
 		METH_VARARGS | METH_KEYWORDS,
 		OnlineLDA_update_parameters_doc},
-	{"update_variables",
-		(PyCFunction)OnlineLDA_update_variables,
-		METH_VARARGS | METH_KEYWORDS,
-		OnlineLDA_update_variables_doc},
-	{"do_e_step",
-		(PyCFunction)OnlineLDA_update_variables,
-		METH_VARARGS | METH_KEYWORDS,
-		"Alias for C{update_variables}."},
 	{"__reduce__", (PyCFunction)OnlineLDA_reduce, METH_NOARGS, 0},
 	{"__setstate__", (PyCFunction)OnlineLDA_setstate, METH_VARARGS, 0},
 	{0}
@@ -146,12 +198,68 @@ PyTypeObject OnlineLDA_type = {
 	OnlineLDA_methods,                /*tp_methods*/
 	0,                                /*tp_members*/
 	OnlineLDA_getset,                 /*tp_getset*/
-	&Distribution_type,               /*tp_base*/
+	&LDA_type,                        /*tp_base*/
 	0,                                /*tp_dict*/
 	0,                                /*tp_descr_get*/
 	0,                                /*tp_descr_set*/
 	0,                                /*tp_dictoffset*/
 	(initproc)OnlineLDA_init,         /*tp_init*/
+	0,                                /*tp_alloc*/
+	Distribution_new,                 /*tp_new*/
+};
+
+static PyGetSetDef BatchLDA_getset[] = {
+	{0}
+};
+
+static PyMethodDef BatchLDA_methods[] = {
+	{"update_parameters",
+		(PyCFunction)BatchLDA_update_parameters,
+		METH_VARARGS | METH_KEYWORDS,
+		BatchLDA_update_parameters_doc},
+	{"__reduce__", (PyCFunction)BatchLDA_reduce, METH_NOARGS, 0},
+	{"__setstate__", (PyCFunction)BatchLDA_setstate, METH_VARARGS, 0},
+	{0}
+};
+
+PyTypeObject BatchLDA_type = {
+	PyObject_HEAD_INIT(0)
+	0,                                /*ob_size*/
+	"trlda.models.BatchLDA",         /*tp_name*/
+	sizeof(BatchLDAObject),          /*tp_basicsize*/
+	0,                                /*tp_itemsize*/
+	(destructor)Distribution_dealloc, /*tp_dealloc*/
+	0,                                /*tp_print*/
+	0,                                /*tp_getattr*/
+	0,                                /*tp_setattr*/
+	0,                                /*tp_compare*/
+	0,                                /*tp_repr*/
+	0,                                /*tp_as_number*/
+	0,                                /*tp_as_sequence*/
+	0,                                /*tp_as_mapping*/
+	0,                                /*tp_hash */
+	0,                                /*tp_call*/
+	0,                                /*tp_str*/
+	0,                                /*tp_getattro*/
+	0,                                /*tp_setattro*/
+	0,                                /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
+	BatchLDA_doc,                    /*tp_doc*/
+	0,                                /*tp_traverse*/
+	0,                                /*tp_clear*/
+	0,                                /*tp_richcompare*/
+	0,                                /*tp_weaklistoffset*/
+	0,                                /*tp_iter*/
+	0,                                /*tp_iternext*/
+	BatchLDA_methods,                /*tp_methods*/
+	0,                                /*tp_members*/
+	BatchLDA_getset,                 /*tp_getset*/
+	&LDA_type,                        /*tp_base*/
+	0,                                /*tp_dict*/
+	0,                                /*tp_descr_get*/
+	0,                                /*tp_descr_set*/
+	0,                                /*tp_dictoffset*/
+	(initproc)BatchLDA_init,         /*tp_init*/
 	0,                                /*tp_alloc*/
 	Distribution_new,                 /*tp_new*/
 };
@@ -195,13 +303,20 @@ PyMODINIT_FUNC init_trlda() {
 	PyObject* module = Py_InitModule3("_trlda", trlda_methods, trlda_doc);
 
 	// initialize types
+	if(PyType_Ready(&LDA_type) < 0)
+		return;
 	if(PyType_Ready(&OnlineLDA_type) < 0)
+		return;
+	if(PyType_Ready(&BatchLDA_type) < 0)
 		return;
 
 	Py_INCREF(&Distribution_type);
-	Py_INCREF(&OnlineLDA_type);
+	Py_INCREF(&LDA_type);
+	Py_INCREF(&BatchLDA_type);
 
 	// add types to module
 	PyModule_AddObject(module, "Distribution", reinterpret_cast<PyObject*>(&Distribution_type));
+	PyModule_AddObject(module, "LDA", reinterpret_cast<PyObject*>(&LDA_type));
 	PyModule_AddObject(module, "OnlineLDA", reinterpret_cast<PyObject*>(&OnlineLDA_type));
+	PyModule_AddObject(module, "BatchLDA", reinterpret_cast<PyObject*>(&BatchLDA_type));
 }

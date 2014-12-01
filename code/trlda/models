@@ -2,6 +2,8 @@
 #define TRLDA_MODELS_
 
 #include "include/distribution.h"
+#include "include/lda.h"
 #include "include/onlinelda.h"
+#include "include/batchlda.h"
 
 #endif

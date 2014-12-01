@@ -1,4 +1,4 @@
-#include "onlineldainterface.h"
+#include "batchldainterface.h"
 
 #include <new>
 using std::bad_alloc;
@@ -18,40 +18,32 @@ using TRLDA::Exception;
 
 #include "pyutils.h"
 
-const char* OnlineLDA_doc =
+const char* BatchLDA_doc =
 	"An implementation of an online trust region method for latent dirichlet allocation (LDA).";
 
-int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
+int BatchLDA_init(BatchLDAObject* self, PyObject* args, PyObject* kwds) {
 	const char* kwlist[] = {
 		"num_words",
 		"num_topics",
-		"num_documents",
 		"alpha",
-		"eta",
-		"kappa_",
-		"tau_", 0};
+		"eta", 0};
 
 	int num_words;
 	int num_topics;
-	int num_documents;
 	PyObject* alpha = 0;
 	double eta = .3;
 
-	// needed to support opening of old versions of pickled OnlineLDA objects
-	double kappa_ = 0.;
-	double tau_ = 0.;
-
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "iii|Oddd", const_cast<char**>(kwlist),
-			&num_words, &num_topics, &num_documents, &alpha, &eta, &kappa_, &tau_))
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "ii|Od", const_cast<char**>(kwlist),
+			&num_words, &num_topics, &alpha, &eta))
 		return -1;
 
 	try {
 		if(alpha == 0) {
-			self->lda = new OnlineLDA(num_words, num_topics, num_documents, .1, eta);
+			self->lda = new BatchLDA(num_words, num_topics, .1, eta);
 		} else if(PyFloat_Check(alpha)) {
-			self->lda = new OnlineLDA(num_words, num_topics, num_documents, PyFloat_AsDouble(alpha), eta);
+			self->lda = new BatchLDA(num_words, num_topics, PyFloat_AsDouble(alpha), eta);
 		} else if(PyInt_Check(alpha)) {
-			self->lda = new OnlineLDA(num_words, num_topics, num_documents, PyInt_AsLong(alpha), eta);
+			self->lda = new BatchLDA(num_words, num_topics, PyInt_AsLong(alpha), eta);
 		} else {
 			alpha = PyArray_FROM_OTF(alpha, NPY_DOUBLE, NPY_IN_ARRAY);
 
@@ -69,7 +61,7 @@ int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
 				return -1;
 			}
 
-			self->lda = new OnlineLDA(num_words, num_documents, alpha_, eta);
+			self->lda = new BatchLDA(num_words, alpha_, eta);
 		}
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
@@ -80,67 +72,36 @@ int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
 
 
 
-PyObject* OnlineLDA_num_documents(OnlineLDAObject* self, void*) {
-	return PyInt_FromLong(self->lda->numDocuments());
-}
-
-
-
-int OnlineLDA_set_num_documents(OnlineLDAObject* self, PyObject* value, void*) {
-	int num_documents = PyInt_AsLong(value);
-
-	if(PyErr_Occurred())
-		return -1;
-
-	try {
-		self->lda->setNumDocuments(num_documents);
-	} catch(Exception exception) {
-		PyErr_SetString(PyExc_RuntimeError, exception.message());
-		return -1;
-	}
-
-	return 0;
-}
-
-
-
-
-const char* OnlineLDA_update_parameters_doc =
+const char* BatchLDA_update_parameters_doc =
 	"";
 
-PyObject* OnlineLDA_update_parameters(
-	OnlineLDAObject* self,
+PyObject* BatchLDA_update_parameters(
+	BatchLDAObject* self,
 	PyObject* args,
 	PyObject* kwds)
 {
 	const char* kwlist[] = {
 		"docs",
-		"max_iter_tr",
+		"max_epochs",
 		"max_iter_inference",
-		"kappa",
-		"tau",
-		"rho",
-		"adaptive",
-		"init_gamma",
+		"max_iter_alpha",
+		"max_iter_eta",
 		"update_lambda",
 		"update_alpha",
 		"update_eta",
 		"min_alpha",
 		"min_eta", 0};
 
-	OnlineLDA::Documents documents;
-	OnlineLDA::Parameters parameters;
+	BatchLDA::Documents documents;
+	BatchLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iidddbbbbbdd", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iiiibbbdd", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
-			&parameters.maxIterTR,
+			&parameters.maxEpochs,
 			&parameters.maxIterInference,
-			&parameters.kappa,
-			&parameters.tau,
-			&parameters.rho,
-			&parameters.adaptive,
-			&parameters.initGamma,
+			&parameters.maxIterAlpha,
+			&parameters.maxIterEta,
 			&parameters.updateLambda,
 			&parameters.updateAlpha,
 			&parameters.updateEta,
@@ -161,26 +122,25 @@ PyObject* OnlineLDA_update_parameters(
 
 
 
-const char* OnlineLDA_reduce_doc =
+const char* BatchLDA_reduce_doc =
 	"__reduce__(self)\n"
 	"\n"
 	"Method used by Pickle.";
 
-PyObject* OnlineLDA_reduce(OnlineLDAObject* self, PyObject*) {
+PyObject* BatchLDA_reduce(BatchLDAObject* self, PyObject*) {
 	PyObject* alpha = PyArray_FromMatrixXd(self->lda->alpha());
 
 	// constructor arguments
-	PyObject* args = Py_BuildValue("(iiiOd)",
+	PyObject* args = Py_BuildValue("(iiOd)",
 		self->lda->numWords(),
 		self->lda->numTopics(),
-		self->lda->numDocuments(),
 		alpha,
 		self->lda->eta());
 
 	Py_DECREF(alpha);
 
 	PyObject* lambda = LDA_lambda(reinterpret_cast<LDAObject*>(self), 0);
-	PyObject* state = Py_BuildValue("(Oi)", lambda, self->lda->updateCount());
+	PyObject* state = Py_BuildValue("(O)", lambda);
 	PyObject* result = Py_BuildValue("(OOO)", Py_TYPE(self), args, state);
 
 	Py_DECREF(lambda);
@@ -192,21 +152,20 @@ PyObject* OnlineLDA_reduce(OnlineLDAObject* self, PyObject*) {
 
 
 
-const char* OnlineLDA_setstate_doc =
+const char* BatchLDA_setstate_doc =
 	"__setstate__(self)\n"
 	"\n"
 	"Method used by Pickle.";
 
-PyObject* OnlineLDA_setstate(OnlineLDAObject* self, PyObject* state) {
+PyObject* BatchLDA_setstate(BatchLDAObject* self, PyObject* state) {
 	PyObject* lambda;
 	int updateCount;
 
-	if(!PyArg_ParseTuple(state, "(Oi)", &lambda, &updateCount))
+	if(!PyArg_ParseTuple(state, "(O)", &lambda))
 		return 0;
 
 	try {
 		LDA_set_lambda(reinterpret_cast<LDAObject*>(self), lambda, 0);
-		self->lda->setUpdateCount(updateCount);
 	} catch(Exception exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return 0;

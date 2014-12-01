@@ -109,7 +109,7 @@ class Tests(unittest.TestCase):
 		model.alpha = [4., 4.]
 
 		for i in range(100):
-			model.update_parameters(documents, rho=.1, max_iter=0, update_lambda=False, update_alpha=True)
+			model.update_parameters(documents, rho=.1, max_iter_tr=0, update_lambda=False, update_alpha=True)
 
 		# make sure empirical Bayes went in the right direction
 		self.assertGreater(model.alpha[0], model.alpha[1])
