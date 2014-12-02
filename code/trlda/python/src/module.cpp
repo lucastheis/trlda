@@ -9,6 +9,7 @@
 #include "ldainterface.h"
 #include "onlineldainterface.h"
 #include "batchldainterface.h"
+#include "cumulativeldainterface.h"
 #include "utilsinterface.h"
 #include "Eigen/Core"
 
@@ -225,8 +226,8 @@ static PyMethodDef BatchLDA_methods[] = {
 PyTypeObject BatchLDA_type = {
 	PyObject_HEAD_INIT(0)
 	0,                                /*ob_size*/
-	"trlda.models.BatchLDA",         /*tp_name*/
-	sizeof(BatchLDAObject),          /*tp_basicsize*/
+	"trlda.models.BatchLDA",          /*tp_name*/
+	sizeof(BatchLDAObject),           /*tp_basicsize*/
 	0,                                /*tp_itemsize*/
 	(destructor)Distribution_dealloc, /*tp_dealloc*/
 	0,                                /*tp_print*/
@@ -244,22 +245,78 @@ PyTypeObject BatchLDA_type = {
 	0,                                /*tp_setattro*/
 	0,                                /*tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
-	BatchLDA_doc,                    /*tp_doc*/
+	BatchLDA_doc,                     /*tp_doc*/
 	0,                                /*tp_traverse*/
 	0,                                /*tp_clear*/
 	0,                                /*tp_richcompare*/
 	0,                                /*tp_weaklistoffset*/
 	0,                                /*tp_iter*/
 	0,                                /*tp_iternext*/
-	BatchLDA_methods,                /*tp_methods*/
+	BatchLDA_methods,                 /*tp_methods*/
 	0,                                /*tp_members*/
-	BatchLDA_getset,                 /*tp_getset*/
+	BatchLDA_getset,                  /*tp_getset*/
 	&LDA_type,                        /*tp_base*/
 	0,                                /*tp_dict*/
 	0,                                /*tp_descr_get*/
 	0,                                /*tp_descr_set*/
 	0,                                /*tp_dictoffset*/
-	(initproc)BatchLDA_init,         /*tp_init*/
+	(initproc)BatchLDA_init,          /*tp_init*/
+	0,                                /*tp_alloc*/
+	Distribution_new,                 /*tp_new*/
+};
+
+static PyGetSetDef CumulativeLDA_getset[] = {
+	{0}
+};
+
+static PyMethodDef CumulativeLDA_methods[] = {
+	{"update_parameters",
+		(PyCFunction)CumulativeLDA_update_parameters,
+		METH_VARARGS | METH_KEYWORDS,
+		CumulativeLDA_update_parameters_doc},
+	{"__reduce__", (PyCFunction)CumulativeLDA_reduce, METH_NOARGS, 0},
+	{"__setstate__", (PyCFunction)CumulativeLDA_setstate, METH_VARARGS, 0},
+	{0}
+};
+
+PyTypeObject CumulativeLDA_type = {
+	PyObject_HEAD_INIT(0)
+	0,                                /*ob_size*/
+	"trlda.models.CumulativeLDA",     /*tp_name*/
+	sizeof(CumulativeLDAObject),      /*tp_basicsize*/
+	0,                                /*tp_itemsize*/
+	(destructor)Distribution_dealloc, /*tp_dealloc*/
+	0,                                /*tp_print*/
+	0,                                /*tp_getattr*/
+	0,                                /*tp_setattr*/
+	0,                                /*tp_compare*/
+	0,                                /*tp_repr*/
+	0,                                /*tp_as_number*/
+	0,                                /*tp_as_sequence*/
+	0,                                /*tp_as_mapping*/
+	0,                                /*tp_hash */
+	0,                                /*tp_call*/
+	0,                                /*tp_str*/
+	0,                                /*tp_getattro*/
+	0,                                /*tp_setattro*/
+	0,                                /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
+	CumulativeLDA_doc,                /*tp_doc*/
+	0,                                /*tp_traverse*/
+	0,                                /*tp_clear*/
+	0,                                /*tp_richcompare*/
+	0,                                /*tp_weaklistoffset*/
+	0,                                /*tp_iter*/
+	0,                                /*tp_iternext*/
+	CumulativeLDA_methods,            /*tp_methods*/
+	0,                                /*tp_members*/
+	CumulativeLDA_getset,             /*tp_getset*/
+	&LDA_type,                        /*tp_base*/
+	0,                                /*tp_dict*/
+	0,                                /*tp_descr_get*/
+	0,                                /*tp_descr_set*/
+	0,                                /*tp_dictoffset*/
+	(initproc)CumulativeLDA_init,     /*tp_init*/
 	0,                                /*tp_alloc*/
 	Distribution_new,                 /*tp_new*/
 };
@@ -309,14 +366,18 @@ PyMODINIT_FUNC init_trlda() {
 		return;
 	if(PyType_Ready(&BatchLDA_type) < 0)
 		return;
+	if(PyType_Ready(&CumulativeLDA_type) < 0)
+		return;
 
 	Py_INCREF(&Distribution_type);
 	Py_INCREF(&LDA_type);
 	Py_INCREF(&BatchLDA_type);
+	Py_INCREF(&CumulativeLDA_type);
 
 	// add types to module
 	PyModule_AddObject(module, "Distribution", reinterpret_cast<PyObject*>(&Distribution_type));
 	PyModule_AddObject(module, "LDA", reinterpret_cast<PyObject*>(&LDA_type));
 	PyModule_AddObject(module, "OnlineLDA", reinterpret_cast<PyObject*>(&OnlineLDA_type));
 	PyModule_AddObject(module, "BatchLDA", reinterpret_cast<PyObject*>(&BatchLDA_type));
+	PyModule_AddObject(module, "CumulativeLDA", reinterpret_cast<PyObject*>(&CumulativeLDA_type));
 }

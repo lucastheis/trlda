@@ -73,7 +73,7 @@ double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Param
 
 			ArrayXXd psiGamma = digamma(gamma);
 			Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
-			ArrayXXd psiGammaDiff = (psiGamma.rowwise() - psiGammaSum).rowwise().sum();
+			ArrayXd psiGammaDiff = (psiGamma.rowwise() - psiGammaSum).rowwise().sum();
 
 			if(parameters.verbosity > 1)
 				cout << "Optimizing alpha..." << endl;
