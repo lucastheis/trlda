@@ -43,4 +43,6 @@ PyObject* LDA_update_variables(LDAObject*, PyObject*, PyObject*);
 int PyList_ToDocuments(PyObject* docs, void* documents);
 PyObject* PyList_FromDocuments(const LDA::Documents& documents);
 
+PyObject* LDA_str(PyObject*);
+
 #endif

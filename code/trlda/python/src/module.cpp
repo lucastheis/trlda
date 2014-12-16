@@ -124,7 +124,7 @@ PyTypeObject LDA_type = {
 	0,                                /*tp_as_mapping*/
 	0,                                /*tp_hash */
 	0,                                /*tp_call*/
-	0,                                /*tp_str*/
+	LDA_str,                          /*tp_str*/
 	0,                                /*tp_getattro*/
 	0,                                /*tp_setattro*/
 	0,                                /*tp_as_buffer*/

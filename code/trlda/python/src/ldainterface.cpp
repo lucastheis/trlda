@@ -16,6 +16,15 @@ using std::endl;
 #include "trlda/utils"
 using TRLDA::Exception;
 
+#include <sstream>
+using std::stringstream;
+
+#include <iomanip>
+using std::setprecision;
+
+#include <string>
+using std::string;
+
 #include "pyutils.h"
 
 const char* LDA_doc = "Abstract base class.\n";
@@ -315,4 +324,25 @@ PyObject* LDA_update_variables(
 	Py_XDECREF(latents);
 
 	return 0;
+}
+
+
+
+PyObject* LDA_str(PyObject* self_) {
+	LDAObject* self = reinterpret_cast<LDAObject*>(self_);
+
+	int numTopics = self->lda->numTopics();
+	double eta = self->lda->eta();
+	ArrayXXd alpha = self->lda->alpha();
+	double alphaMax = alpha.maxCoeff();
+	double alphaMin = alpha.minCoeff();
+
+	stringstream strstr;
+
+	strstr << "Number of topics: " << numTopics << "\n";
+	strstr << setprecision(4) << "Eta: " << eta << "\n";
+	strstr << setprecision(4) << "Alpha: " << alphaMin << ", " << alphaMax << " (min, max)\n";
+
+	const string& str = strstr.str();
+	return PyString_FromString(str.c_str());
 }
