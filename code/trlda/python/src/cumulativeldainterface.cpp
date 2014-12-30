@@ -89,13 +89,14 @@ PyObject* CumulativeLDA_update_parameters(
 		"update_alpha",
 		"min_alpha",
 		"emp_bayes_threshold",
+		"inference_threshold",
 		"verbosity", 0};
 
 	CumulativeLDA::Documents documents;
 	CumulativeLDA::Parameters parameters;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iiibbddi", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iiibbdddi", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&parameters.maxEpochs,
 			&parameters.maxIterInference,
@@ -104,6 +105,7 @@ PyObject* CumulativeLDA_update_parameters(
 			&parameters.updateAlpha,
 			&parameters.minAlpha,
 			&parameters.empBayesThreshold,
+			&parameters.threshold,
 			&parameters.verbosity))
 		return 0;
 

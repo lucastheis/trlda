@@ -52,6 +52,9 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 
 	ArrayXXd lambdaPrime = mLambda;
 
+	// randomly initializing lambda seems to improve performance
+	mLambda = sampleGamma(numTopics(), numWords(), 100) / 100.;
+
 	if(parameters.updateLambda) {
 		for(int epoch = 0; epoch < parameters.maxEpochs; ++epoch) {
 			// compute sufficient statistics (E-step)
@@ -136,11 +139,4 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 				// improvement was very small
 				break;
 
-			// update current function value
-			L = Lprime;
-
-		}
-	}
-
-	return 1.;
-}
+			// update

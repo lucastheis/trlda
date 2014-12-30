@@ -189,7 +189,6 @@ class OnlineLDA:
                 # We represent phi implicitly to save memory and time.
                 # Substituting the value of the optimal phi back into
                 # the update for gamma gives this update. Cf. Lee&Seung 2001.
-
                 gammad = self._alpha + expElogthetad * n.dot(cts / phinorm, expElogbetad.T)
 
                 Elogthetad = dirichlet_expectation(gammad)

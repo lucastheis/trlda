@@ -251,7 +251,7 @@ PyObject* LDA_update_variables(
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "latents", "inference_method", "max_iter", "num_samples", "burn_in", 0};
+	const char* kwlist[] = {"docs", "latents", "inference_method", "max_iter", "threshold", "num_samples", "burn_in", 0};
 
 	LDA::Documents documents;
 	LDA::Parameters parameters;
@@ -259,11 +259,12 @@ PyObject* LDA_update_variables(
 	const char* inference_method = 0;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|Osiii", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|Osidii", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
 			&latents,
 			&inference_method,
 			&parameters.maxIterInference,
+			&parameters.threshold,
 			&parameters.numSamples,
 			&parameters.burnIn))
 		return 0;
