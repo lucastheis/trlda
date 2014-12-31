@@ -27,6 +27,7 @@ TRLDA::CumulativeLDA::CumulativeLDA(
 		LDA(numWords, numTopics, alpha, eta)
 {
 	mLambda.setConstant(eta);
+	mPsiGammaDiff = ArrayXd::Zero(numTopics);
 }
 
 
@@ -38,6 +39,7 @@ TRLDA::CumulativeLDA::CumulativeLDA(
 		LDA(numWords, alpha, eta)
 {
 	mLambda.setConstant(eta);
+	mPsiGammaDiff = ArrayXd::Zero(alpha.size());
 }
 
 
@@ -139,4 +141,10 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 				// improvement was very small
 				break;
 
-			// update
+			// update current function value
+			L = Lprime;
+		}
+	}
+
+	return 1.;
+}
