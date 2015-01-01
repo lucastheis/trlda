@@ -24,7 +24,8 @@ TRLDA::CumulativeLDA::CumulativeLDA(
 	int numTopics,
 	double alpha,
 	double eta) :
-		LDA(numWords, numTopics, alpha, eta)
+		LDA(numWords, numTopics, alpha, eta),
+		mNumDocuments(0)
 {
 	mLambda.setConstant(eta);
 	mPsiGammaDiff = ArrayXd::Zero(numTopics);
@@ -36,7 +37,8 @@ TRLDA::CumulativeLDA::CumulativeLDA(
 	int numWords,
 	ArrayXd alpha,
 	double eta) :
-		LDA(numWords, alpha, eta)
+		LDA(numWords, alpha, eta),
+		mNumDocuments(0)
 {
 	mLambda.setConstant(eta);
 	mPsiGammaDiff = ArrayXd::Zero(alpha.size());
@@ -80,12 +82,13 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 		Array<double, 1, Dynamic> psiGammaSum = digamma(gamma.colwise().sum());
 
 		mPsiGammaDiff += (psiGamma.rowwise() - psiGammaSum).rowwise().sum();
+		mNumDocuments += documents.size();
 
 		if(parameters.verbosity > 1)
 			cout << "Optimizing alpha..." << endl;
 
 		// lower bound module constants
-		double L = documents.size() * (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum())
+		double L = mNumDocuments * (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum())
 			+ (mPsiGammaDiff * (mAlpha - 1.)).sum();
 		double Lprime = L;
 
@@ -94,11 +97,11 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 				cout << "\tCurrent function value: " << L << endl;
 
 			// gradient of lower bound with respect to alpha
-			ArrayXd g = mPsiGammaDiff - documents.size() * (digamma(mAlpha) - digamma(mAlpha.sum()));
+			ArrayXd g = mPsiGammaDiff - mNumDocuments * (digamma(mAlpha) - digamma(mAlpha.sum()));
 
 			// components that make up Hessian
-			ArrayXd h = -static_cast<double>(documents.size()) * polygamma(1, mAlpha);
-			double z = documents.size() * polygamma(1, mAlpha.sum());
+			ArrayXd h = -static_cast<double>(mNumDocuments) * polygamma(1, mAlpha);
+			double z = mNumDocuments * polygamma(1, mAlpha.sum());
 			double c = (g / h).sum() / (1. / z + (1. / h).sum());
 
 			double rho = .2;
@@ -119,7 +122,7 @@ double TRLDA::CumulativeLDA::updateParameters(const Documents& documents, const 
 					continue;
 				}
 
-				Lprime = documents.size() * (lngamma(alpha.sum()) - lngamma(alpha).sum())
+				Lprime = mNumDocuments * (lngamma(alpha.sum()) - lngamma(alpha).sum())
 					+ (mPsiGammaDiff * (alpha - 1.)).sum();
 
 				if(L <= Lprime) {

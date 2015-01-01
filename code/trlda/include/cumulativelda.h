@@ -22,6 +22,7 @@ namespace TRLDA {
 
 		protected:
 			ArrayXd mPsiGammaDiff;
+			int mNumDocuments;
 	};
 }
 
