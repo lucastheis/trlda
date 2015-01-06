@@ -104,6 +104,10 @@ static PyMethodDef LDA_methods[] = {
 		(PyCFunction)LDA_update_variables,
 		METH_VARARGS | METH_KEYWORDS,
 		"Alias for C{update_variables}."},
+    {"lower_bound",
+		(PyCFunction)LDA_lower_bound,
+		METH_VARARGS | METH_KEYWORDS,
+		LDA_lower_bound_doc},
 	{0}
 };
 

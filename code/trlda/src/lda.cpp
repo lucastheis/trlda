@@ -291,3 +291,57 @@ pair<ArrayXXd, ArrayXXd> TRLDA::LDA::updateVariablesGibbs(
 
 	return make_pair(theta, sstats);
 }
+
+
+
+double TRLDA::LDA::lowerBound(
+	const Documents& documents,
+	const Parameters& parameters) const
+{
+	pair<ArrayXXd, ArrayXXd> results = updateVariables(documents, parameters);
+	ArrayXXd& gamma = results.first;
+	ArrayXXd& sstats = results.second;
+
+	ArrayXXd psiLambda = digamma(mLambda);
+	ArrayXd lambdaSum = mLambda.rowwise().sum();
+	ArrayXd psiLambdaSum = digamma(lambdaSum);
+
+	double EqLogPwPb = ((mEta + sstats - mLambda) * (psiLambda.colwise() - psiLambdaSum)).sum();
+	double EqLogPz = 0.;
+	double EqLogPthta = 0.;
+
+	for(int d = 0; d < documents.size(); ++d) {
+		double gammaSum = gamma.col(d).sum();
+		ArrayXd psiGamma = digamma(gamma.col(d));
+		ArrayXXd phi(numTopics(), documents[d].size());
+		Array<int, 1, Dynamic> counts(documents[d].size());
+
+		// recompute phi
+		for(int i = 0; i < documents[d].size(); ++i) {
+			counts[i] = documents[d][i].second;
+			phi.col(i) = psiLambda.row(documents[d][i].first);
+		}
+		phi.colwise() -= psiLambdaSum;
+		phi.colwise() += psiGamma;
+		phi.rowwise() -= logSumExp(phi);
+		phi = phi.exp();
+
+		ArrayXd EqLogTheta = psiGamma - digamma(gammaSum);
+
+		Array<double, 1, Dynamic> tmp = EqLogTheta.matrix().transpose() * phi.matrix();
+		tmp -= (phi * phi.log()).colwise().sum();
+
+		// sum over words
+		EqLogPz += (counts.cast<double>() * tmp).sum();
+
+		EqLogPthta += ((mAlpha - gamma.col(d)) * EqLogTheta).sum();
+		EqLogPthta -= lngamma(gammaSum);
+		EqLogPthta += lngamma(gamma.col(d)).sum();
+	}
+
+	EqLogPthta += (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum()) * documents.size();
+	EqLogPwPb += numTopics() * lngamma(numWords() * mEta) - lngamma(lambdaSum).sum(); 
+	EqLogPwPb -= numTopics() * numWords() * lngamma(mEta) - lngamma(mLambda).sum();
+
+	return EqLogPwPb + EqLogPz + EqLogPthta;
+}

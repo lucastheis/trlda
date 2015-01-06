@@ -13,6 +13,7 @@ using TRLDA::LDA;
 extern const char* LDA_doc;
 extern const char* LDA_update_variables_doc;
 extern const char* LDA_sample_doc;
+extern const char* LDA_lower_bound_doc;
 
 struct LDAObject {
 	PyObject_HEAD
@@ -39,6 +40,8 @@ PyObject* LDA_sample(LDAObject*, PyObject*, PyObject*);
 
 PyObject* LDA_update_parameters(LDAObject*, PyObject*, PyObject*);
 PyObject* LDA_update_variables(LDAObject*, PyObject*, PyObject*);
+
+PyObject* LDA_lower_bound(LDAObject*, PyObject*, PyObject*);
 
 int PyList_ToDocuments(PyObject* docs, void* documents);
 PyObject* PyList_FromDocuments(const LDA::Documents& documents);

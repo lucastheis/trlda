@@ -123,6 +123,10 @@ namespace TRLDA {
 				const Documents& documents,
 				const Parameters& parameters) = 0;
 
+			virtual double lowerBound(
+				const Documents& documents,
+				const Parameters& parameters = Parameters()) const;
+
 		protected:
 			ArrayXd mAlpha;
 			double mEta;

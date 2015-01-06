@@ -329,6 +329,60 @@ PyObject* LDA_update_variables(
 
 
 
+const char* LDA_lower_bound_doc =
+	"Estimate lower bound for the given documents.";
+
+PyObject* LDA_lower_bound(
+	LDAObject* self,
+	PyObject* args,
+	PyObject* kwds)
+{
+	const char* kwlist[] = {"docs", "inference_method", "max_iter", "num_samples", "burn_in", 0};
+
+	LDA::Documents documents;
+	LDA::Parameters parameters;
+	const char* inference_method = 0;
+
+	// parse arguments
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|Osiii", const_cast<char**>(kwlist),
+			&PyList_ToDocuments, &documents,
+			&inference_method,
+			&parameters.maxIterInference,
+			&parameters.numSamples,
+			&parameters.burnIn))
+		return 0;
+
+	if(inference_method) {
+		switch(inference_method[0]) {
+			case 'g':
+			case 'G':
+				parameters.inferenceMethod = LDA::GIBBS;
+				break;
+
+			case 'v':
+			case 'V':
+				parameters.inferenceMethod = LDA::VI;
+				break;
+
+			default:
+				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'gibbs' or 'vi'.");
+				return 0;
+		}
+	}
+
+	try {
+		return PyFloat_FromDouble(
+			self->lda->lowerBound(documents, parameters));
+	} catch(Exception& exception) {
+		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return 0;
+	}
+
+	return 0;
+}
+
+
+
 PyObject* LDA_str(PyObject* self_) {
 	LDAObject* self = reinterpret_cast<LDAObject*>(self_);
 
