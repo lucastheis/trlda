@@ -79,7 +79,7 @@ static PyGetSetDef LDA_getset[] = {
 	{"_lambda",
 		(getter)LDA_lambda,
 		(setter)LDA_set_lambda,
-		"Alias for C{lambdas}."},
+		"Alias for L{lambdas}."},
 	{"alpha",
 		(getter)LDA_alpha,
 		(setter)LDA_set_alpha,
@@ -103,7 +103,7 @@ static PyMethodDef LDA_methods[] = {
 	{"do_e_step",
 		(PyCFunction)LDA_update_variables,
 		METH_VARARGS | METH_KEYWORDS,
-		"Alias for C{update_variables}."},
+		"Alias for L{update_variables}."},
     {"lower_bound",
 		(PyCFunction)LDA_lower_bound,
 		METH_VARARGS | METH_KEYWORDS,
@@ -157,11 +157,11 @@ static PyGetSetDef OnlineLDA_getset[] = {
 	{"num_documents",
 		(getter)OnlineLDA_num_documents,
 		(setter)OnlineLDA_set_num_documents,
-		"Number of documents of the (maybe hypothetical) complete dataset."},
+		"Number of documents in the complete dataset."},
 	{"update_count",
 		(getter)OnlineLDA_update_count,
 		(setter)OnlineLDA_set_update_count,
-		"Number of non-empty calls to L{update_parameters}."},
+		"Number of parameter updates."},
 	{0}
 };
 

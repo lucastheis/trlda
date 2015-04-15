@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>trlda.models.OnlineLDA</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$']],
+        displayMath: [['$$','$$']],
+        skipTags: ["script","noscript","style","textarea","code"],
+        processEnvironments: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="trlda-module.html">Package&nbsp;trlda</a> ::
+        <a href="trlda.models-module.html">Package&nbsp;models</a> ::
+        Class&nbsp;OnlineLDA
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="trlda.models.OnlineLDA-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class OnlineLDA</h1><p class="nomargin-top"><span class="codelink"><a href="trlda.models-pysrc.html#OnlineLDA">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+  object --+        
+           |        
+<a href="trlda.models.Distribution-class.html">Distribution</a> --+    
+               |    
+             <a href="trlda.models.LDA-class.html">LDA</a> --+
+                   |
+                  <strong class="uidshort">OnlineLDA</strong>
+</pre>
+
+<hr />
+<p>An implementation of an online trust region method for latent 
+  Dirichlet allocation.</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>model = OnlineLDA(
+<span class="py-output">        num_words=7000,</span>
+<span class="py-output">        num_topics=100,</span>
+<span class="py-output">        num_documents=10000,</span>
+<span class="py-output">        alpha=.1,</span>
+<span class="py-output">        eta=.3)</span></pre>
+  <p><code>alpha</code> can be a scalar or an array with one entry for each
+  topic.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Instance Methods</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>float</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.OnlineLDA-class.html#update_parameters" class="summary-sig-name">update_parameters</a>(<span class="summary-sig-arg">docs</span>,
+        <span class="summary-sig-arg">max_iter_tr</span>=<span class="summary-sig-default">10</span>,
+        <span class="summary-sig-arg">max_iter_inference</span>=<span class="summary-sig-default">20</span>,
+        <span class="summary-sig-arg">kappa</span>=<span class="summary-sig-default">.7</span>,
+        <span class="summary-sig-arg">tau</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Updates beliefs over parameters.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#OnlineLDA.update_parameters">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.LDA-class.html">LDA</a></code></b>:
+      <code><a href="trlda.models.LDA-class.html#do_e_step">do_e_step</a></code>,
+      <code><a href="trlda.models.LDA-class.html#lower_bound">lower_bound</a></code>,
+      <code><a href="trlda.models.LDA-class.html#sample">sample</a></code>,
+      <code><a href="trlda.models.LDA-class.html#update_variables">update_variables</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.Distribution-class.html">Distribution</a></code></b>:
+      <code><a href="trlda.models.Distribution-class.html#__init__">__init__</a></code>,
+      <code><a href="trlda.models.Distribution-class.html#__new__">__new__</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Properties</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="num_documents"></a><span class="summary-name">num_documents</span><br />
+      Number of documents in the complete dataset.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="update_count"></a><span class="summary-name">update_count</span><br />
+      Number of parameter updates.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.LDA-class.html">LDA</a></code></b>:
+      <code><a href="trlda.models.LDA-class.html#alpha">alpha</a></code>,
+      <code><a href="trlda.models.LDA-class.html#eta">eta</a></code>,
+      <code><a href="trlda.models.LDA-class.html#lambdas">lambdas</a></code>,
+      <code><a href="trlda.models.LDA-class.html#num_topics">num_topics</a></code>,
+      <code><a href="trlda.models.LDA-class.html#num_words">num_words</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Method Details</span></td>
+</tr>
+</table>
+<a name="update_parameters"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">update_parameters</span>(<span class="sig-arg">docs</span>,
+        <span class="sig-arg">max_iter_tr</span>=<span class="sig-default">10</span>,
+        <span class="sig-arg">max_iter_inference</span>=<span class="sig-default">20</span>,
+        <span class="sig-arg">kappa</span>=<span class="sig-default">.7</span>,
+        <span class="sig-arg">tau</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="trlda.models-pysrc.html#OnlineLDA.update_parameters">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Updates beliefs over parameters.</p>
+  <p>Set <code>max_iter_tr</code> to zero to perform the standard natural 
+  gradient step of stochastic variational inference (in this case increase 
+  <code>max_iter_inference</code>).</p>
+  <p>By default, the learning rate is automatically set to</p>
+  <p>$$\rho_t = (\tau + t)^{-\kappa},$$</p>
+  <p>where $t$ is the number of calls to this function.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>docs</code></strong> (<code>list</code>) - a batch of documents</li>
+        <li><strong class="pname"><code>max_iter_tr</code></strong> (<code>int</code>) - number of steps in trust-region optimization</li>
+        <li><strong class="pname"><code>max_iter_inference</code></strong> (<code>int</code>) - number of variational inference steps per trust-region step</li>
+        <li><strong class="pname"><code>kappa</code></strong> (<code>float</code>) - controls the learning rate decay</li>
+        <li><strong class="pname"><code>tau</code></strong> (<code>float</code>) - decreases intial learning rates</li>
+        <li><strong class="pname"><code>rho</code></strong> (<code>float</code>) - can be used to manually set the learning rate</li>
+        <li><strong class="pname"><code>adaptive</code></strong> (<code>bool</code>) - automatically adapt the learning rate (see Ranganath et al., 
+          2013)</li>
+        <li><strong class="pname"><code>init_gamma</code></strong> (<code>bool</code>) - initialize beliefs over $\boldsymbol{\theta}$ with beliefs of 
+          previous trust-region step (default: True)</li>
+        <li><strong class="pname"><code>update_lambda</code></strong> (<code>bool</code>) - if <code>False</code>, don't update beliefs over topics, 
+          $\boldsymbol{\lambda}$ (default: True)</li>
+        <li><strong class="pname"><code>update_alpha</code></strong> (<code>bool</code>) - if True, update $\boldsymbol{\alpha}$ via empirical Bayes 
+          (default: False)</li>
+        <li><strong class="pname"><code>update_eta</code></strong> (<code>bool</code>) - if True, update $\eta$ via empirical Bayes (default: False)</li>
+        <li><strong class="pname"><code>min_alpha</code></strong> (<code>float</code>) - constrain the $\alpha_k$ to be at least this large (default: 
+          1e-6)</li>
+        <li><strong class="pname"><code>min_eta</code></strong> (<code>float</code>) - constrain $\eta$ to be at least this large (default: 1e-6)</li>
+        <li><strong class="pname"><code>verbosity</code></strong> (<code>int</code>) - controls how many messages are printed</li>
+    </ul></dd>
+    <dt>Returns: <code>float</code></dt>
+        <dd>the learning rate used in this update</dd>
+  </dl>
+<div class="fields">      <p><strong>See Also:</strong>
+        <a href="trlda.models.OnlineLDA-class.html#update_count" 
+        class="link">update_count</a>
+      </p>
+</div></td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Apr 16 00:53:35 2015
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

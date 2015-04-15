@@ -27,7 +27,10 @@ using std::string;
 
 #include "pyutils.h"
 
-const char* LDA_doc = "Abstract base class.\n";
+const char* LDA_doc = 
+	"Abstract base class.\n"
+	"\n"
+	"@undocumented: __init__, __new__, __str__\n";
 
 int LDA_init(LDAObject* self, PyObject* args, PyObject* kwds) {
 	PyErr_SetString(PyExc_NotImplementedError, "This is an abstract class.");
@@ -217,7 +220,7 @@ const char* LDA_sample_doc =
 	"\n"
 	"Samples a specified number of documents from the model.\n"
 	"\n"
-	"Topics ($\\bm{\\beta}$) are first sampled from the current Dirichlet beliefs over topics. "
+	"Topics ($\\boldsymbol{\\beta}$) are first sampled from the current Dirichlet beliefs over topics. "
 	"This is done only once per call to C{sample} and all documents are sampled conditioned on "
 	"these topics. The length of the documents is sampled from a Poisson distribution "
 	"where the rate (average length) is given by C{length}. Documents of "
@@ -270,13 +273,13 @@ const char* LDA_update_variables_doc =
 	"\n"
 	"The beliefs may be estimated via mean-field variational inference ('VI') "
 	"or collapsed Gibbs sampling ('GIBBS'). The method returns a tuple of a "
-	"$K$-dimensional column vector and a $W \\times K$-dimensional matrix of suficcient "
+	"$K$-dimensional column vector and a $W \\times K$-dimensional matrix of sufficient "
 	"statistics. In the case of variational inference, the vector represents the Dirichlet "
-	"beliefs over the distribution of topics ($\\bm{\\theta}$) while for Gibbs sampling it "
-	"represents a sample of $\\bm{\\theta}$ conditioned on the sampled topic assignments. "
+	"beliefs over the distribution of topics ($\\boldsymbol{\\theta}$) while for Gibbs sampling it "
+	"represents a sample of $\\boldsymbol{\\theta}$ conditioned on the sampled topic assignments $\\mathbf{z}$. "
 	"This can be used to initialize the algorithm in a later call to C{update_variables} "
-	"via C{latents}. The matrix of sufficient statistics indicates expected counts of "
-	"occurences of words with topics in the given set of documents.\n"
+	"via C{latents}. The matrix of sufficient statistics indicates the expected number of "
+	"occurrences of words with topics in the given set of documents.\n"
 	"\n"
 	"Each document should be represented as a list of words, where each word is a tuple\n"
 	"of a word ID and a word count.\n"
@@ -285,7 +288,7 @@ const char* LDA_update_variables_doc =
 	"@param docs: a set of documents for which to perform inference\n"
 	"\n"
 	"@type  latents: C{ndarray}\n"
-	"@param latents: can be used to initialize beliefs over $\\bm{\\theta}$\n"
+	"@param latents: can be used to initialize beliefs over $\\boldsymbol{\\theta}$\n"
 	"\n"
 	"@type  inference_method: C{str}\n"
 	"@param inference_method: either 'VI' or 'GIBBS'\n"
@@ -294,16 +297,16 @@ const char* LDA_update_variables_doc =
 	"@param max_iter: maximum number of belief updates in variational inference\n"
 	"\n"
 	"@type  threshold: C{float}\n"
-	"@param threshold: if the change in beliefs over $\\bm{\\theta}$ is smaller than this, stop\n"
+	"@param threshold: if the average change in beliefs over $\\boldsymbol{\\theta}$ is smaller than this, stop iterations\n"
 	"\n"
 	"@type  num_samples: C{int}\n"
 	"@param num_samples: number of samples used to estimate expected word/topic occurences\n"
 	"\n"
 	"@type  burn_in: C{int}\n"
-	"@param burn_in: number of sampling steps performed before starting to collect samples\n"
+	"@param burn_in: number of MCMC updates performed before starting to collect samples\n"
 	"\n"
 	"@rtype: C{tuple}\n"
-	"@return: a tuple of beliefs over $\\bm{\\theta}$$ and sufficient statistics";
+	"@return: a tuple of beliefs over $\\boldsymbol{\\theta}$$ and sufficient statistics";
 
 PyObject* LDA_update_variables(
 	LDAObject* self,
@@ -391,7 +394,7 @@ PyObject* LDA_update_variables(
 const char* LDA_lower_bound_doc =
 	"lower_bound(docs, num_documents=-1, inference_method='VI', max_iter=100, num_samples=1, burn_in=2)\n"
 	"\n"
-	"Estimate lower bound, $\\mathcal{L}(\\bm{\\lambda})$, for the given set of documents.\n"
+	"Estimate lower bound, $\\mathcal{L}(\\boldsymbol{\\lambda})$, for the given set of documents.\n"
 	"\n"
 	"@type  docs: C{list}\n"
 	"@param docs: a set of documents for which to perform inference\n"

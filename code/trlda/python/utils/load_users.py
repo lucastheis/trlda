@@ -12,7 +12,7 @@ def load_users(filepath, batch_size=None, stochastic=False, threshold=4):
 	where each tuple contains an item id and a rating.
 
 	Each line is assumed to contain a 3-tuple of a user id, an item id, and a rating.
-	The ratings of users should be grouped. For example:
+	The ratings of users should be grouped. For example::
 
 		1488844   1  3
 		1488844   8  4
@@ -31,10 +31,13 @@ def load_users(filepath, batch_size=None, stochastic=False, threshold=4):
 	@type  stochastic: C{bool}
 	@param stochastic: if True, the batch size is drawn from a Poisson distribution
 
+	@type  threshold: C{int}
+	@param threshold: only load users whose rating is greater or equal this threshold
+
 	@rtype: C{list}/C{generator}
 	@return: returns either a list of users or a generator of lists of users
 
-	@seealso: L{load_documents}
+	@seealso: L{load_documents()}
 	"""
 
 	def user_generator(filepath, batch_size):
@@ -98,6 +101,9 @@ def load_users_as_dict(filepath, batch_size=None, stochastic=False, threshold=4)
 	"""
 	Like L{load_users}, but users are stored in a dictionary instead of a list.
 	The keys correspond to user IDs and the values are lists of item/rating pairs.
+
+	@rtype: C{dict}/C{generator}
+	@return: returns either a dictionary of users or a generator of dictionaries of users
 	"""
 
 	def user_generator(filepath, batch_size):

@@ -1,11 +1,11 @@
-## Latent Dirichlet allocation with trust regions
+## Online latent Dirichlet allocation
 
 This module offers relatively fast implementations of a *trust-region method
 for stochastic variational inference* and related algorithms applied to latent Dirichlet
 allocation. These are realized in the following models:
 
-* `BatchLDA` (Blei et al., 2013)
 * `OnlineLDA` (Hoffman et al., 2010; 2013; Theis & Hoffman, 2015)
+* `BatchLDA` (Blei et al., 2013)
 * `CumulativeLDA` (Broderick et al., 2013)
 
 Additional features include adaptive learning rates (Ranganath et al., 2013) and automatic tuning

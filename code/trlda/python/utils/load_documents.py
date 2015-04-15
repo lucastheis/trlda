@@ -5,14 +5,14 @@ except:
 
 def load_documents(filepath, batch_size=None, stochastic=False):
 	"""
-	Load documents from text file. If C{batch_size} is given, behaves like a generator
+	Load documents from a text file. If C{batch_size} is given, behaves like a generator
 	and returns one batch at a time. Each document is represented as a list of tuples,
 	where each tuple contains a word id and a word count.
 
 	Each line of the text file is assumed to contain one document and should start with
 	the number of unique words in that document, followed by the words. Each word
 	should be represented by its id and a number of occurences separated by a colon. For
-	example:
+	example::
 
 		6 5600:2 293:1 5548:1 2577:1 3733:3 2677:2
 
@@ -25,7 +25,7 @@ def load_documents(filepath, batch_size=None, stochastic=False):
 	@rtype: C{list}/C{generator}
 	@return: returns either a list of documents or a generator of lists of documents
 
-	@seealso: L{load_users}
+	@seealso: L{load_users()}
 	"""
 
 	def document_generator(filepath, batch_size):

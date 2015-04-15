@@ -19,7 +19,18 @@ using TRLDA::Exception;
 #include "pyutils.h"
 
 const char* OnlineLDA_doc =
-	"An implementation of an online trust region method for latent dirichlet allocation (LDA).";
+	"An implementation of an online trust region method for latent Dirichlet allocation.\n"
+	"\n"
+	"\t>>> model = OnlineLDA(\n"
+	"\t\tnum_words=7000,\n"
+	"\t\tnum_topics=100,\n"
+	"\t\tnum_documents=10000,\n"
+	"\t\talpha=.1,\n"
+	"\t\teta=.3)\n"
+	"\n"
+	"C{alpha} can be a scalar or an array with one entry for each topic.\n"
+	"\n"
+	"@undocumented: __new__, __init__, __reduce__, __setstate__";
 
 int OnlineLDA_init(OnlineLDAObject* self, PyObject* args, PyObject* kwds) {
 	const char* kwlist[] = {
@@ -137,7 +148,7 @@ const char* OnlineLDA_update_parameters_doc =
 	"Set C{max_iter_tr} to zero to perform the standard natural gradient step of stochastic variational "
 	"inference (in this case increase C{max_iter_inference}).\n"
 	"\n"
-	"By default, the learning rate is automatically determined to be\n"
+	"By default, the learning rate is automatically set to\n"
 	"\n"
 	"$$\\rho_t = (\\tau + t)^{-\\kappa},$$\n"
 	"\n"
@@ -159,19 +170,19 @@ const char* OnlineLDA_update_parameters_doc =
 	"@param tau: decreases intial learning rates\n"
 	"\n"
 	"@type  rho: C{float}\n"
-	"@param rho: can be used to manually set the learning rate for this update\n"
+	"@param rho: can be used to manually set the learning rate\n"
 	"\n"
 	"@type  adaptive: C{bool}\n"
 	"@param adaptive: automatically adapt the learning rate (see Ranganath et al., 2013)\n"
 	"\n"
 	"@type  init_gamma: C{bool}\n"
-	"@param init_gamma: initialize beliefs over $\\bm{\\theta}$ with beliefs of previous trust-region step (default: True)\n"
+	"@param init_gamma: initialize beliefs over $\\boldsymbol{\\theta}$ with beliefs of previous trust-region step (default: True)\n"
 	"\n"
 	"@type  update_lambda: C{bool}\n"
-	"@param update_lambda: if C{False}, don't update beliefs over topics, $\\bm{\\lambda}$ (default: True)\n"
+	"@param update_lambda: if C{False}, don't update beliefs over topics, $\\boldsymbol{\\lambda}$ (default: True)\n"
 	"\n"
 	"@type  update_alpha: C{bool}\n"
-	"@param update_alpha: if True, update $\\bm{\\alpha}$ via empirical Bayes (default: False)\n"
+	"@param update_alpha: if True, update $\\boldsymbol{\\alpha}$ via empirical Bayes (default: False)\n"
 	"\n"
 	"@type  update_eta: C{bool}\n"
 	"@param update_eta: if True, update $\\eta$ via empirical Bayes (default: False)\n"
@@ -188,7 +199,7 @@ const char* OnlineLDA_update_parameters_doc =
 	"@rtype: C{float}\n"
 	"@return: the learning rate used in this update\n"
 	"\n"
-	"@seealso: L{update_count()}";
+	"@seealso: L{update_count}";
 
 PyObject* OnlineLDA_update_parameters(
 	OnlineLDAObject* self,

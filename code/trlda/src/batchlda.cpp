@@ -43,7 +43,7 @@ TRLDA::BatchLDA::BatchLDA(
 double TRLDA::BatchLDA::updateParameters(const Documents& documents, const Parameters& parameters) {
 	if(documents.size() == 0)
 		// nothing to be done
-		return true;
+		return 1.;
 
 	for(int epoch = 0; epoch < parameters.maxEpochs; ++epoch) {
 		pair<ArrayXXd, ArrayXXd> results;

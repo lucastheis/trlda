@@ -19,7 +19,13 @@ using TRLDA::Exception;
 #include "pyutils.h"
 
 const char* BatchLDA_doc =
-	"An implementation of an online trust region method for latent dirichlet allocation (LDA).";
+	"An implementation of latent Dirichlet allocation (LDA).\n"
+	"\n"
+	"\t>>> model = BatchLDA(num_words=7000, num_topics=100, alpha=.1, eta=.3)\n"
+	"\n"
+	"C{alpha} can be a scalar or an array with one entry for each topic.\n"
+	"\n"
+	"@undocumented: __new__, __init__, __reduce__, __setstate__";
 
 int BatchLDA_init(BatchLDAObject* self, PyObject* args, PyObject* kwds) {
 	const char* kwlist[] = {
@@ -73,7 +79,46 @@ int BatchLDA_init(BatchLDAObject* self, PyObject* args, PyObject* kwds) {
 
 
 const char* BatchLDA_update_parameters_doc =
-	"";
+	"update_parameters(docs, max_epochs=100, max_iter_inference=100, **kwargs)\n"
+	"\n"
+	"Updates beliefs over parameters.\n"
+	"\n"
+	"$$\\rho_t = (\\tau + t)^{-\\kappa},$$\n"
+	"\n"
+	"where $t$ is the number of calls to this function.\n"
+	"\n"
+	"@type  docs: C{list}\n"
+	"@param docs: a batch of documents\n"
+	"\n"
+	"@type  max_epochs: C{int}\n"
+	"@param max_epochs: number of repeated updates to parameters and hyperparameters\n"
+	"\n"
+	"@type  max_iter_inference: C{int}\n"
+	"@param max_iter_inference: number of variational inference steps per trust-region step\n"
+	"\n"
+	"@type  max_iter_alpha: C{int}\n"
+	"@param max_iter_alpha: number of Newton steps applied to $\\boldsymbo{\\alpha}$\n"
+	"\n"
+	"@type  max_iter_eta: C{int}\n"
+	"@param max_iter_eta: number of Newton steps applied to $\\eta$\n"
+	"\n"
+	"@type  update_lambda: C{bool}\n"
+	"@param update_lambda: if C{False}, don't update beliefs over topics, $\\boldsymbol{\\lambda}$ (default: True)\n"
+	"\n"
+	"@type  update_alpha: C{bool}\n"
+	"@param update_alpha: if True, update $\\boldsymbol{\\alpha}$ via empirical Bayes (default: False)\n"
+	"\n"
+	"@type  update_eta: C{bool}\n"
+	"@param update_eta: if True, update $\\eta$ via empirical Bayes (default: False)\n"
+	"\n"
+	"@type  min_alpha: C{float}\n"
+	"@param min_alpha: constrain the $\\alpha_k$ to be at least this large (default: 1e-6)\n"
+	"\n"
+	"@type  min_eta: C{float}\n"
+	"@param min_eta: constrain $\\eta$ to be at least this large (default: 1e-6)\n"
+	"\n"
+	"@type  verbosity: C{int}\n"
+	"@param verbosity: controls how many messages are printed";
 
 PyObject* BatchLDA_update_parameters(
 	BatchLDAObject* self,
@@ -114,7 +159,6 @@ PyObject* BatchLDA_update_parameters(
 		return 0;
 
 	try {
-		// return learning rate used
 		return PyFloat_FromDouble(self->lda->updateParameters(documents, parameters));
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
