@@ -213,7 +213,27 @@ PyObject* PyList_FromDocuments(const LDA::Documents& documents) {
 
 
 const char* LDA_sample_doc =
-	"";
+	"sample(self, num_documents, length)\n"
+	"\n"
+	"Samples a specified number of documents from the model.\n"
+	"\n"
+	"Topics ($\\bm{\\beta}$) are first sampled from the current Dirichlet beliefs over topics. "
+	"This is done only once per call to C{sample} and all documents are sampled conditioned on "
+	"these topics. The length of the documents is sampled from a Poisson distribution "
+	"where the rate (average length) is given by C{length}. Documents of "
+	"length zero are possible.\n"
+	"\n"
+	"Words are represented as tuples of a word ID and a word count. All generated word counts will "
+	"be 1, but words can occur multiple times in a document, e.g., C{[(12, 1), (4, 1), (12, 1)]}.\n"
+	"\n"
+	"@type  num_documents: C{int}\n"
+	"@param num_documents: number of documents to sample\n"
+	"\n"
+	"@type  length: C{int}\n"
+	"@param length: average length of the sampled documents\n"
+	"\n"
+	"@rtype: C{list}\n"
+	"@return: a list of documents, where each document is a list of tuples";
 
 PyObject* LDA_sample(
 	LDAObject* self,
@@ -244,7 +264,46 @@ PyObject* LDA_sample(
 
 
 const char* LDA_update_variables_doc =
-	"";
+	"update_variables(docs, latents=None, inference_method='VI', max_iter=100, threshold=0.001, num_samples=1, burn_in=2)\n"
+	"\n"
+	"Computes beliefs over topic assignments ($z_{di}$) for the given documents.\n"
+	"\n"
+	"The beliefs may be estimated via mean-field variational inference ('VI') "
+	"or collapsed Gibbs sampling ('GIBBS'). The method returns a tuple of a "
+	"$K$-dimensional column vector and a $W \\times K$-dimensional matrix of suficcient "
+	"statistics. In the case of variational inference, the vector represents the Dirichlet "
+	"beliefs over the distribution of topics ($\\bm{\\theta}$) while for Gibbs sampling it "
+	"represents a sample of $\\bm{\\theta}$ conditioned on the sampled topic assignments. "
+	"This can be used to initialize the algorithm in a later call to C{update_variables} "
+	"via C{latents}. The matrix of sufficient statistics indicates expected counts of "
+	"occurences of words with topics in the given set of documents.\n"
+	"\n"
+	"Each document should be represented as a list of words, where each word is a tuple\n"
+	"of a word ID and a word count.\n"
+	"\n"
+	"@type  docs: C{list}\n"
+	"@param docs: a set of documents for which to perform inference\n"
+	"\n"
+	"@type  latents: C{ndarray}\n"
+	"@param latents: can be used to initialize beliefs over $\\bm{\\theta}$\n"
+	"\n"
+	"@type  inference_method: C{str}\n"
+	"@param inference_method: either 'VI' or 'GIBBS'\n"
+	"\n"
+	"@type  max_iter: C{int}\n"
+	"@param max_iter: maximum number of belief updates in variational inference\n"
+	"\n"
+	"@type  threshold: C{float}\n"
+	"@param threshold: if the change in beliefs over $\\bm{\\theta}$ is smaller than this, stop\n"
+	"\n"
+	"@type  num_samples: C{int}\n"
+	"@param num_samples: number of samples used to estimate expected word/topic occurences\n"
+	"\n"
+	"@type  burn_in: C{int}\n"
+	"@param burn_in: number of sampling steps performed before starting to collect samples\n"
+	"\n"
+	"@rtype: C{tuple}\n"
+	"@return: a tuple of beliefs over $\\bm{\\theta}$$ and sufficient statistics";
 
 PyObject* LDA_update_variables(
 	LDAObject* self,
@@ -291,7 +350,7 @@ PyObject* LDA_update_variables(
 				break;
 
 			default:
-				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'gibbs' or 'vi'.");
+				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'GIBBS' or 'VI'.");
 				return 0;
 		}
 	}
@@ -330,22 +389,47 @@ PyObject* LDA_update_variables(
 
 
 const char* LDA_lower_bound_doc =
-	"Estimate lower bound for the given documents.";
+	"lower_bound(docs, num_documents=-1, inference_method='VI', max_iter=100, num_samples=1, burn_in=2)\n"
+	"\n"
+	"Estimate lower bound, $\\mathcal{L}(\\bm{\\lambda})$, for the given set of documents.\n"
+	"\n"
+	"@type  docs: C{list}\n"
+	"@param docs: a set of documents for which to perform inference\n"
+	"\n"
+	"@type  num_documents: C{int}\n"
+	"@param num_documents: can be used to target a lower bound with a different number of documents\n"
+	"\n"
+	"@type  inference_method: C{str}\n"
+	"@param inference_method: either 'VI' or 'GIBBS'\n"
+	"\n"
+	"@type  max_iter: C{int}\n"
+	"@param max_iter: maximum number of belief updates in variational inference\n"
+	"\n"
+	"@type  num_samples: C{int}\n"
+	"@param num_samples: number of samples used to estimate expected word/topic occurences\n"
+	"\n"
+	"@type  burn_in: C{int}\n"
+	"@param burn_in: number of sampling steps performed before starting to collect samples\n"
+	"\n"
+	"@rtype: C{float}\n"
+	"@return: estimate of the lower bound";
 
 PyObject* LDA_lower_bound(
 	LDAObject* self,
 	PyObject* args,
 	PyObject* kwds)
 {
-	const char* kwlist[] = {"docs", "inference_method", "max_iter", "num_samples", "burn_in", 0};
+	const char* kwlist[] = {"docs", "num_documents", "inference_method", "max_iter", "num_samples", "burn_in", 0};
 
 	LDA::Documents documents;
 	LDA::Parameters parameters;
+	int num_documents = -1;
 	const char* inference_method = 0;
 
 	// parse arguments
-	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|Osiii", const_cast<char**>(kwlist),
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|isiii", const_cast<char**>(kwlist),
 			&PyList_ToDocuments, &documents,
+			&num_documents,
 			&inference_method,
 			&parameters.maxIterInference,
 			&parameters.numSamples,
@@ -365,14 +449,14 @@ PyObject* LDA_lower_bound(
 				break;
 
 			default:
-				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'gibbs' or 'vi'.");
+				PyErr_SetString(PyExc_TypeError, "`inference_method` should be either 'GIBBS' or 'VI'.");
 				return 0;
 		}
 	}
 
 	try {
 		return PyFloat_FromDouble(
-			self->lda->lowerBound(documents, parameters));
+			self->lda->lowerBound(documents, parameters, num_documents));
 	} catch(Exception& exception) {
 		PyErr_SetString(PyExc_RuntimeError, exception.message());
 		return 0;

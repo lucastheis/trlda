@@ -296,18 +296,30 @@ pair<ArrayXXd, ArrayXXd> TRLDA::LDA::updateVariablesGibbs(
 
 double TRLDA::LDA::lowerBound(
 	const Documents& documents,
-	const Parameters& parameters) const
+	const Parameters& parameters,
+	int numDocuments) const
 {
+	// correction factor for using a subset of total documents
+	double factor = numDocuments >= 0 ?
+		numDocuments / static_cast<double>(documents.size()) : 1;
+
+	// inference over latent variables
 	pair<ArrayXXd, ArrayXXd> results = updateVariables(documents, parameters);
 	ArrayXXd& gamma = results.first;
 	ArrayXXd& sstats = results.second;
 
+	// some helper variables
 	ArrayXXd psiLambda = digamma(mLambda);
 	ArrayXd lambdaSum = mLambda.rowwise().sum();
 	ArrayXd psiLambdaSum = digamma(lambdaSum);
 
-	double EqLogPwPb = ((mEta + sstats - mLambda) * (psiLambda.colwise() - psiLambdaSum)).sum();
+	// terms due to p(w | z, \beta), p(\beta), and q(\beta)
+	double EqLogPwPb = ((mEta + factor * sstats - mLambda) * (psiLambda.colwise() - psiLambdaSum)).sum();
+
+	// terms due to p(z) and q(z)
 	double EqLogPz = 0.;
+
+	// terms due to p(\theta) and q(\theta)
 	double EqLogPthta = 0.;
 
 	for(int d = 0; d < documents.size(); ++d) {
@@ -339,9 +351,10 @@ double TRLDA::LDA::lowerBound(
 		EqLogPthta += lngamma(gamma.col(d)).sum();
 	}
 
+	// Dirichlet normalization constants
 	EqLogPthta += (lngamma(mAlpha.sum()) - lngamma(mAlpha).sum()) * documents.size();
-	EqLogPwPb += numTopics() * lngamma(numWords() * mEta) - lngamma(lambdaSum).sum(); 
+	EqLogPwPb += numTopics() * lngamma(numWords() * mEta) - lngamma(lambdaSum).sum();
 	EqLogPwPb -= numTopics() * numWords() * lngamma(mEta) - lngamma(mLambda).sum();
 
-	return EqLogPwPb + EqLogPz + EqLogPthta;
+	return EqLogPwPb + factor * EqLogPz + factor * EqLogPthta;
 }

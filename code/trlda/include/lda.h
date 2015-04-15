@@ -125,7 +125,8 @@ namespace TRLDA {
 
 			virtual double lowerBound(
 				const Documents& documents,
-				const Parameters& parameters = Parameters()) const;
+				const Parameters& parameters = Parameters(),
+				int numDocuments = -1) const;
 
 		protected:
 			ArrayXd mAlpha;

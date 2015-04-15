@@ -28,6 +28,11 @@ namespace TRLDA {
 				const Documents& documents,
 				const Parameters& parameters = Parameters());
 
+			virtual double lowerBound(
+				const Documents& documents,
+				const Parameters& parameters = Parameters(),
+				int numDocuments = -1) const;
+
 		private:
 			int mNumDocuments;
 			int mUpdateCounter;

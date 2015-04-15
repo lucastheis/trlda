@@ -69,6 +69,33 @@ class Tests(unittest.TestCase):
 
 
 
+	def test_lower_bound(self):
+		W = 100
+		K = 22
+		D = 30
+		N = 60
+
+		# generate random vocabulary
+		vocab = [''.join(choice(ascii_letters) for _ in range(5 + random.randint(10))) for _ in range(W)]
+		model0 = ReferenceLDA(vocab, K, D, 0.1, 0.3, 1024., 0.9)
+
+		model1 = OnlineLDA(num_words=W, num_topics=K, num_documents=D)
+		model1.alpha = model0._alpha
+		model1.lambdas = model0._lambda
+
+		# generate D/2 random documents of average length N
+		docs1 = model1.sample(D // 2, N)
+		docs0 = [zip(*doc) for doc in docs1]
+
+		# estimate lower bound
+		elbo1 = model1.lower_bound(docs1)
+		elbo0 = model0.approx_bound(docs0)
+
+		# estimate should deviate less than 1% from reference estimate
+		self.assertLess(abs(elbo1 - elbo0) / abs(elbo0), 0.01)
+
+
+
 	def test_gibbs(self):
 		model = OnlineLDA(num_words=100, num_topics=10, num_documents=1000)
 

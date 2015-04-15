@@ -178,3 +178,14 @@ double TRLDA::OnlineLDA::updateParameters(const Documents& documents, const Para
 
 	return rho;
 }
+
+
+
+double TRLDA::OnlineLDA::lowerBound(
+	const Documents& documents,
+	const Parameters& parameters,
+	int numDocuments) const
+{
+	return LDA::lowerBound(documents, parameters,
+		numDocuments >= 0 ? numDocuments : mNumDocuments);
+}
