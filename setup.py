@@ -55,8 +55,9 @@ modules = [
 			] + extra_compile_args)
 	]
 
-# enable parallel compilation
-CCompiler.compile = parallelCCompiler
+if 'CC_PARALLEL' in os.environ and os.environ['CC_PARALLEL'] == '1':
+	# enable parallel compilation
+	CCompiler.compile = parallelCCompiler
 
 setup(
 	name='trlda',
