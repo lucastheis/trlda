@@ -157,7 +157,11 @@ static PyGetSetDef OnlineLDA_getset[] = {
 	{"num_documents",
 		(getter)OnlineLDA_num_documents,
 		(setter)OnlineLDA_set_num_documents,
-		"Number of documents of the (hypothetical) full dataset."},
+		"Number of documents of the (maybe hypothetical) complete dataset."},
+	{"update_count",
+		(getter)OnlineLDA_update_count,
+		(setter)OnlineLDA_set_update_count,
+		"Number of non-empty calls to L{update_parameters}."},
 	{0}
 };
 

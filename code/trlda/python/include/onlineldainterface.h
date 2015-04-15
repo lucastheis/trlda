@@ -24,6 +24,9 @@ int OnlineLDA_init(OnlineLDAObject*, PyObject*, PyObject*);
 PyObject* OnlineLDA_num_documents(OnlineLDAObject*, void*);
 int OnlineLDA_set_num_documents(OnlineLDAObject*, PyObject*, void*);
 
+PyObject* OnlineLDA_update_count(OnlineLDAObject*, void*);
+int OnlineLDA_set_update_count(OnlineLDAObject*, PyObject*, void*);
+
 PyObject* OnlineLDA_update_parameters(OnlineLDAObject*, PyObject*, PyObject*);
 
 PyObject* OnlineLDA_reduce(OnlineLDAObject*, PyObject*);

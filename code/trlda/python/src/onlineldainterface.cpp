@@ -104,9 +104,91 @@ int OnlineLDA_set_num_documents(OnlineLDAObject* self, PyObject* value, void*) {
 
 
 
+PyObject* OnlineLDA_update_count(OnlineLDAObject* self, void*) {
+	return PyInt_FromLong(self->lda->updateCount());
+}
+
+
+
+int OnlineLDA_set_update_count(OnlineLDAObject* self, PyObject* value, void*) {
+	int update_count = PyInt_AsLong(value);
+
+	if(PyErr_Occurred())
+		return -1;
+
+	try {
+		self->lda->setUpdateCount(update_count);
+	} catch(Exception exception) {
+		PyErr_SetString(PyExc_RuntimeError, exception.message());
+		return -1;
+	}
+
+	return 0;
+}
+
+
+
 
 const char* OnlineLDA_update_parameters_doc =
-	"";
+	"update_parameters(docs, max_iter_tr=10, max_iter_inference=20, kappa=.7, tau=100, **kwargs)\n"
+	"\n"
+	"Updates beliefs over parameters.\n"
+	"\n"
+	"Set C{max_iter_tr} to zero to perform the standard natural gradient step of stochastic variational "
+	"inference (in this case increase C{max_iter_inference}).\n"
+	"\n"
+	"By default, the learning rate is automatically determined to be\n"
+	"\n"
+	"$$\\rho_t = (\\tau + t)^{-\\kappa},$$\n"
+	"\n"
+	"where $t$ is the number of calls to this function.\n"
+	"\n"
+	"@type  docs: C{list}\n"
+	"@param docs: a batch of documents\n"
+	"\n"
+	"@type  max_iter_tr: C{int}\n"
+	"@param max_iter_tr: number of steps in trust-region optimization\n"
+	"\n"
+	"@type  max_iter_inference: C{int}\n"
+	"@param max_iter_inference: number of variational inference steps per trust-region step\n"
+	"\n"
+	"@type  kappa: C{float}\n"
+	"@param kappa: controls the learning rate decay\n"
+	"\n"
+	"@type  tau: C{float}\n"
+	"@param tau: decreases intial learning rates\n"
+	"\n"
+	"@type  rho: C{float}\n"
+	"@param rho: can be used to manually set the learning rate for this update\n"
+	"\n"
+	"@type  adaptive: C{bool}\n"
+	"@param adaptive: automatically adapt the learning rate (see Ranganath et al., 2013)\n"
+	"\n"
+	"@type  init_gamma: C{bool}\n"
+	"@param init_gamma: initialize beliefs over $\\bm{\\theta}$ with beliefs of previous trust-region step (default: True)\n"
+	"\n"
+	"@type  update_lambda: C{bool}\n"
+	"@param update_lambda: if C{False}, don't update beliefs over topics, $\\bm{\\lambda}$ (default: True)\n"
+	"\n"
+	"@type  update_alpha: C{bool}\n"
+	"@param update_alpha: if True, update $\\bm{\\alpha}$ via empirical Bayes (default: False)\n"
+	"\n"
+	"@type  update_eta: C{bool}\n"
+	"@param update_eta: if True, update $\\eta$ via empirical Bayes (default: False)\n"
+	"\n"
+	"@type  min_alpha: C{float}\n"
+	"@param min_alpha: constrain the $\\alpha_k$ to be at least this large (default: 1e-6)\n"
+	"\n"
+	"@type  min_eta: C{float}\n"
+	"@param min_eta: constrain $\\eta$ to be at least this large (default: 1e-6)\n"
+	"\n"
+	"@type  verbosity: C{int}\n"
+	"@param verbosity: controls how many messages are printed\n"
+	"\n"
+	"@rtype: C{float}\n"
+	"@return: the learning rate used in this update\n"
+	"\n"
+	"@seealso: L{update_count()}";
 
 PyObject* OnlineLDA_update_parameters(
 	OnlineLDAObject* self,
@@ -131,6 +213,7 @@ PyObject* OnlineLDA_update_parameters(
 
 	OnlineLDA::Documents documents;
 	OnlineLDA::Parameters parameters;
+	parameters.maxIterInference = 20;
 
 	// parse arguments
 	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&|iidddbbbbbddi", const_cast<char**>(kwlist),

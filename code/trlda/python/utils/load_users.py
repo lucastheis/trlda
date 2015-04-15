@@ -11,6 +11,17 @@ def load_users(filepath, batch_size=None, stochastic=False, threshold=4):
 	and returns one batch at a time. Each user is represented as a list of tuples,
 	where each tuple contains an item id and a rating.
 
+	Each line is assumed to contain a 3-tuple of a user id, an item id, and a rating.
+	The ratings of users should be grouped. For example:
+
+		1488844   1  3
+		1488844   8  4
+		1488844  17  2
+		1488844  30  3
+		8850131  33  4
+		8850131  35  1
+		8850131  86  5
+
 	@type  filepath: C{str}
 	@param filepath: path to file containing data
 
@@ -22,6 +33,8 @@ def load_users(filepath, batch_size=None, stochastic=False, threshold=4):
 
 	@rtype: C{list}/C{generator}
 	@return: returns either a list of users or a generator of lists of users
+
+	@seealso: L{load_documents}
 	"""
 
 	def user_generator(filepath, batch_size):
