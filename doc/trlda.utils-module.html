@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>trlda.utils</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$']],
+        displayMath: [['$$','$$']],
+        skipTags: ["script","noscript","style","textarea","code"],
+        processEnvironments: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="trlda-module.html">Package&nbsp;trlda</a> ::
+        Package&nbsp;utils
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="trlda.utils-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PACKAGE DESCRIPTION ==================== -->
+<h1 class="epydoc">Package utils</h1><p class="nomargin-top"><span class="codelink"><a href="trlda.utils-pysrc.html">source&nbsp;code</a></span></p>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Functions</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code>/<code>generator</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.utils-module.html#load_documents" class="summary-sig-name">load_documents</a>(<span class="summary-sig-arg">filepath</span>,
+        <span class="summary-sig-arg">batch_size</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">stochastic</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Load documents from a text file.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code>/<code>generator</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.utils-module.html#load_users" class="summary-sig-name">load_users</a>(<span class="summary-sig-arg">filepath</span>,
+        <span class="summary-sig-arg">batch_size</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">stochastic</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">threshold</span>=<span class="summary-sig-default">4</span>)</span><br />
+      Load users from a text file.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>dict</code>/<code>generator</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.utils-module.html#load_users_as_dict" class="summary-sig-name">load_users_as_dict</a>(<span class="summary-sig-arg">filepath</span>,
+        <span class="summary-sig-arg">batch_size</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">stochastic</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">threshold</span>=<span class="summary-sig-default">4</span>)</span><br />
+      Like <a href="trlda.utils-module.html#load_users" 
+      class="link">load_users</a>, but users are stored in a dictionary 
+      instead of a list.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.utils-module.html#random_select" class="summary-sig-name">random_select</a>(<span class="summary-sig-arg">k</span>,
+        <span class="summary-sig-arg">n</span>)</span><br />
+      Randomly selects $k$ out of $n$ elements.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="sample_dirichlet"></a><span class="summary-sig-name">sample_dirichlet</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="polygamma"></a><span class="summary-sig-name">polygamma</span>(<span class="summary-sig-arg">...</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Function Details</span></td>
+</tr>
+</table>
+<a name="load_documents"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">load_documents</span>(<span class="sig-arg">filepath</span>,
+        <span class="sig-arg">batch_size</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">stochastic</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Load documents from a text file. If <code>batch_size</code> is given, 
+  behaves like a generator and returns one batch at a time. Each document 
+  is represented as a list of tuples, where each tuple contains a word id 
+  and a word count.</p>
+  <p>Each line of the text file is assumed to contain one document and 
+  should start with the number of unique words in that document, followed 
+  by the words. Each word should be represented by its id and a number of 
+  occurences separated by a colon. For example:</p>
+<pre class="literalblock">
+       6 5600:2 293:1 5548:1 2577:1 3733:3 2677:2
+</pre>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>batch_size</code></strong> (<code>int</code>) - the number of documents to return at once</li>
+        <li><strong class="pname"><code>stochastic</code></strong> (<code>bool</code>) - if True, the batch size is drawn from a Poisson distribution</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code>/<code>generator</code></dt>
+        <dd>returns either a list of documents or a generator of lists of 
+          documents</dd>
+  </dl>
+<div class="fields">      <p><strong>See Also:</strong>
+        <a href="trlda.utils-module.html#load_users" 
+        class="link">load_users()</a>
+      </p>
+</div></td></tr></table>
+</div>
+<a name="load_users"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">load_users</span>(<span class="sig-arg">filepath</span>,
+        <span class="sig-arg">batch_size</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">stochastic</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">threshold</span>=<span class="sig-default">4</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Load users from a text file. If `batch_size` is given, behaves like a 
+  generator and returns one batch at a time. Each user is represented as a 
+  list of tuples, where each tuple contains an item id and a rating.</p>
+  <p>Each line is assumed to contain a 3-tuple of a user id, an item id, 
+  and a rating. The ratings of users should be grouped. For example:</p>
+<pre class="literalblock">
+       1488844   1  3
+       1488844   8  4
+       1488844  17  2
+       1488844  30  3
+       8850131  33  4
+       8850131  35  1
+       8850131  86  5
+</pre>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>filepath</code></strong> (<code>str</code>) - path to file containing data</li>
+        <li><strong class="pname"><code>batch_size</code></strong> (<code>int</code>) - the number of users to return at once</li>
+        <li><strong class="pname"><code>stochastic</code></strong> (<code>bool</code>) - if True, the batch size is drawn from a Poisson distribution</li>
+        <li><strong class="pname"><code>threshold</code></strong> (<code>int</code>) - only load users whose rating is greater or equal this threshold</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code>/<code>generator</code></dt>
+        <dd>returns either a list of users or a generator of lists of users</dd>
+  </dl>
+<div class="fields">      <p><strong>See Also:</strong>
+        <a href="trlda.utils-module.html#load_documents" 
+        class="link">load_documents()</a>
+      </p>
+</div></td></tr></table>
+</div>
+<a name="load_users_as_dict"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">load_users_as_dict</span>(<span class="sig-arg">filepath</span>,
+        <span class="sig-arg">batch_size</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">stochastic</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">threshold</span>=<span class="sig-default">4</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Like <a href="trlda.utils-module.html#load_users" 
+  class="link">load_users</a>, but users are stored in a dictionary instead
+  of a list. The keys correspond to user IDs and the values are lists of 
+  item/rating pairs.</p>
+  <dl class="fields">
+    <dt>Returns: <code>dict</code>/<code>generator</code></dt>
+        <dd>returns either a dictionary of users or a generator of 
+          dictionaries of users</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="random_select"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">random_select</span>(<span class="sig-arg">k</span>,
+        <span class="sig-arg">n</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Randomly selects $k$ out of $n$ elements.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>k</code></strong> (<code>int</code>) - the number of elements to pick</li>
+        <li><strong class="pname"><code>n</code></strong> (<code>int</code>) - the number of elements to pick from</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code></dt>
+        <dd>a list of $k$ indices</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Apr 16 13:40:39 2015
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

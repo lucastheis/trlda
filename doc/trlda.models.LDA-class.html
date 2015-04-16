@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>trlda.models.LDA</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$']],
+        displayMath: [['$$','$$']],
+        skipTags: ["script","noscript","style","textarea","code"],
+        processEnvironments: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="trlda-module.html">Package&nbsp;trlda</a> ::
+        <a href="trlda.models-module.html">Package&nbsp;models</a> ::
+        Class&nbsp;LDA
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="trlda.models.LDA-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class LDA</h1><p class="nomargin-top"><span class="codelink"><a href="trlda.models-pysrc.html#LDA">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+  object --+    
+           |    
+<a href="trlda.models.Distribution-class.html">Distribution</a> --+
+               |
+              <strong class="uidshort">LDA</strong>
+</pre>
+
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="trlda.models.BatchLDA-class.html">BatchLDA</a></li><li>, <a href="trlda.models.CumulativeLDA-class.html">CumulativeLDA</a></li><li>, <a href="trlda.models.OnlineLDA-class.html">OnlineLDA</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<p>Abstract base class.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Instance Methods</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="do_e_step"></a><span class="summary-sig-name">do_e_step</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      Alias for <a href="trlda.models.LDA-class.html#update_variables" 
+      class="link">update_variables</a>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.do_e_step">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>float</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#lower_bound" class="summary-sig-name">lower_bound</a>(<span class="summary-sig-arg">docs</span>,
+        <span class="summary-sig-arg">num_documents</span>=<span class="summary-sig-default">-1</span>,
+        <span class="summary-sig-arg">inference_method</span>=<span class="summary-sig-default">'VI'</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">num_samples</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">burn_in</span>=<span class="summary-sig-default">2</span>)</span><br />
+      Estimate lower bound, $\mathcal{L}(\boldsymbol{\lambda})$, for the 
+      given set of documents.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.lower_bound">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#sample" class="summary-sig-name">sample</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">num_documents</span>,
+        <span class="summary-sig-arg">length</span>)</span><br />
+      Samples a specified number of documents from the model.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.sample">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>tuple</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#update_variables" class="summary-sig-name">update_variables</a>(<span class="summary-sig-arg">docs</span>,
+        <span class="summary-sig-arg">latents</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">inference_method</span>=<span class="summary-sig-default">'VI'</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">threshold</span>=<span class="summary-sig-default">0.001</span>,
+        <span class="summary-sig-arg">num_samples</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">burn_in</span>=<span class="summary-sig-default">2</span>)</span><br />
+      Computes beliefs over topic assignments ($z_{di}$) for the given 
+      documents.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.update_variables">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Properties</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="alpha"></a><span class="summary-name">alpha</span><br />
+      Controls Dirichlet prior over topic weights, $\theta_k$.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="eta"></a><span class="summary-name">eta</span><br />
+      Controls Dirichlet prior over topics, $\beta_{ki}$.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="lambdas"></a><span class="summary-name">lambdas</span><br />
+      Parameters governing beliefs over topics, $\beta_{ki}$.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="num_topics"></a><span class="summary-name">num_topics</span><br />
+      Number of topics.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="num_words"></a><span class="summary-name">num_words</span><br />
+      Number of words.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Method Details</span></td>
+</tr>
+</table>
+<a name="lower_bound"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">lower_bound</span>(<span class="sig-arg">docs</span>,
+        <span class="sig-arg">num_documents</span>=<span class="sig-default">-1</span>,
+        <span class="sig-arg">inference_method</span>=<span class="sig-default">'VI'</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">num_samples</span>=<span class="sig-default">1</span>,
+        <span class="sig-arg">burn_in</span>=<span class="sig-default">2</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="trlda.models-pysrc.html#LDA.lower_bound">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Estimate lower bound, $\mathcal{L}(\boldsymbol{\lambda})$, for the 
+  given set of documents.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>docs</code></strong> (<code>list</code>) - a set of documents for which to perform inference</li>
+        <li><strong class="pname"><code>num_documents</code></strong> (<code>int</code>) - can be used to target a lower bound with a different number of 
+          documents</li>
+        <li><strong class="pname"><code>inference_method</code></strong> (<code>str</code>) - either 'VI' or 'GIBBS'</li>
+        <li><strong class="pname"><code>max_iter</code></strong> (<code>int</code>) - maximum number of belief updates in variational inference</li>
+        <li><strong class="pname"><code>num_samples</code></strong> (<code>int</code>) - number of samples used to estimate expected word/topic occurences</li>
+        <li><strong class="pname"><code>burn_in</code></strong> (<code>int</code>) - number of sampling steps performed before starting to collect 
+          samples</li>
+    </ul></dd>
+    <dt>Returns: <code>float</code></dt>
+        <dd>estimate of the lower bound</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="sample"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">sample</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">num_documents</span>,
+        <span class="sig-arg">length</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="trlda.models-pysrc.html#LDA.sample">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Samples a specified number of documents from the model.</p>
+  <p>Topics ($\boldsymbol{\beta}$) are first sampled from the current 
+  Dirichlet beliefs over topics. This is done only once per call to 
+  <code>sample</code> and all documents are sampled conditioned on these 
+  topics. The length of the documents is sampled from a Poisson 
+  distribution where the rate (average length) is given by 
+  <code>length</code>. Documents of length zero are possible.</p>
+  <p>Words are represented as tuples of a word ID and a word count. All 
+  generated word counts will be 1, but words can occur multiple times in a 
+  document, e.g., <code>[(12, 1), (4, 1), (12, 1)]</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>num_documents</code></strong> (<code>int</code>) - number of documents to sample</li>
+        <li><strong class="pname"><code>length</code></strong> (<code>int</code>) - average length of the sampled documents</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code></dt>
+        <dd>a list of documents, where each document is a list of tuples</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="update_variables"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">update_variables</span>(<span class="sig-arg">docs</span>,
+        <span class="sig-arg">latents</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">inference_method</span>=<span class="sig-default">'VI'</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">threshold</span>=<span class="sig-default">0.001</span>,
+        <span class="sig-arg">num_samples</span>=<span class="sig-default">1</span>,
+        <span class="sig-arg">burn_in</span>=<span class="sig-default">2</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="trlda.models-pysrc.html#LDA.update_variables">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Computes beliefs over topic assignments ($z_{di}$) for the given 
+  documents.</p>
+  <p>The beliefs may be estimated via mean-field variational inference 
+  ('VI') or collapsed Gibbs sampling ('GIBBS'). The method returns a tuple 
+  of a $K$-dimensional column vector and a $W \times K$-dimensional matrix 
+  of sufficient statistics. In the case of variational inference, the 
+  vector represents the Dirichlet beliefs over the distribution of topics 
+  ($\boldsymbol{\theta}$) while for Gibbs sampling it represents a sample 
+  of $\boldsymbol{\theta}$ conditioned on the sampled topic assignments 
+  $\mathbf{z}$. This can be used to initialize the algorithm in a later 
+  call to <code>update_variables</code> via <code>latents</code>. The 
+  matrix of sufficient statistics indicates the expected number of 
+  occurrences of words with topics in the given set of documents.</p>
+  <p>Each document should be represented as a list of words, where each 
+  word is a tuple of a word ID and a word count.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>docs</code></strong> (<code>list</code>) - a set of documents for which to perform inference</li>
+        <li><strong class="pname"><code>latents</code></strong> (<code>ndarray</code>) - can be used to initialize beliefs over $\boldsymbol{\theta}$</li>
+        <li><strong class="pname"><code>inference_method</code></strong> (<code>str</code>) - either 'VI' or 'GIBBS'</li>
+        <li><strong class="pname"><code>max_iter</code></strong> (<code>int</code>) - maximum number of belief updates in variational inference</li>
+        <li><strong class="pname"><code>threshold</code></strong> (<code>float</code>) - if the average change in beliefs over $\boldsymbol{\theta}$ is 
+          smaller than this, stop iterations</li>
+        <li><strong class="pname"><code>num_samples</code></strong> (<code>int</code>) - number of samples used to estimate expected word/topic occurences</li>
+        <li><strong class="pname"><code>burn_in</code></strong> (<code>int</code>) - number of MCMC updates performed before starting to collect 
+          samples</li>
+    </ul></dd>
+    <dt>Returns: <code>tuple</code></dt>
+        <dd>a tuple of beliefs over $\boldsymbol{\theta}$$ and sufficient 
+          statistics</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="trlda-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Apr 16 13:40:39 2015
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
