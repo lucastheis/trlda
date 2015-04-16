@@ -46,7 +46,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online latent Dirichlet Allocation</a></th>
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -84,8 +84,11 @@
 
 <hr />
 <p>An implementation of latent Dirichlet allocation (LDA).</p>
+  <p>Example:</p>
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>model = BatchLDA(num_words=7000, num_topics=100, alpha=.1, eta=.3)</pre>
+<span class="py-prompt">&gt;&gt;&gt; </span>documents = load_data(<span class="py-string">'data_train.dat'</span>)
+<span class="py-prompt">&gt;&gt;&gt; </span>model = BatchLDA(num_words=7000, num_topics=100, alpha=.1, eta=.3)
+<span class="py-prompt">&gt;&gt;&gt; </span>model.update_parameters(documents, max_epochs=100)</pre>
   <p><code>alpha</code> can be a scalar or an array with one entry for each
   topic.</p>
 
@@ -97,6 +100,69 @@
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Instance Methods</span></td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="do_e_step"></a><span class="summary-sig-name">do_e_step</span>(<span class="summary-sig-arg">...</span>)</span><br />
+      Alias for <a href="trlda.models.LDA-class.html#update_variables" 
+      class="link">update_variables</a>.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.do_e_step">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>float</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#lower_bound" class="summary-sig-name">lower_bound</a>(<span class="summary-sig-arg">docs</span>,
+        <span class="summary-sig-arg">num_documents</span>=<span class="summary-sig-default">-1</span>,
+        <span class="summary-sig-arg">inference_method</span>=<span class="summary-sig-default">'VI'</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">num_samples</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">burn_in</span>=<span class="summary-sig-default">2</span>)</span><br />
+      Estimate lower bound, $\mathcal{L}(\boldsymbol{\lambda})$, for the 
+      given set of documents.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.lower_bound">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#sample" class="summary-sig-name">sample</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">num_documents</span>,
+        <span class="summary-sig-arg">length</span>)</span><br />
+      Samples a specified number of documents from the model.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.sample">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -117,23 +183,40 @@
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>tuple</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="trlda.models.LDA-class.html#update_variables" class="summary-sig-name">update_variables</a>(<span class="summary-sig-arg">docs</span>,
+        <span class="summary-sig-arg">latents</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">inference_method</span>=<span class="summary-sig-default">'VI'</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">threshold</span>=<span class="summary-sig-default">0.001</span>,
+        <span class="summary-sig-arg">num_samples</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">burn_in</span>=<span class="summary-sig-default">2</span>)</span><br />
+      Computes beliefs over topic assignments ($z_{di}$) for the given 
+      documents.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="trlda.models-pysrc.html#LDA.update_variables">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.LDA-class.html">LDA</a></code></b>:
-      <code><a href="trlda.models.LDA-class.html#do_e_step">do_e_step</a></code>,
-      <code><a href="trlda.models.LDA-class.html#lower_bound">lower_bound</a></code>,
-      <code><a href="trlda.models.LDA-class.html#sample">sample</a></code>,
-      <code><a href="trlda.models.LDA-class.html#update_variables">update_variables</a></code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.Distribution-class.html">Distribution</a></code></b>:
-      <code><a href="trlda.models.Distribution-class.html#__init__">__init__</a></code>,
-      <code><a href="trlda.models.Distribution-class.html#__new__">__new__</a></code>
-      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
       <code>__repr__</code>,
@@ -153,15 +236,53 @@
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Properties</span></td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="alpha"></a><span class="summary-name">alpha</span><br />
+      Controls Dirichlet prior over topic weights, $\theta_k$.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="eta"></a><span class="summary-name">eta</span><br />
+      Controls Dirichlet prior over topics, $\beta_{ki}$.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="lambdas"></a><span class="summary-name">lambdas</span><br />
+      Parameters governing beliefs over topics, $\beta_{ki}$.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="num_topics"></a><span class="summary-name">num_topics</span><br />
+      Number of topics.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="num_words"></a><span class="summary-name">num_words</span><br />
+      Number of words.
+      <em>(Inherited from <a href="trlda.models.LDA-class.html">trlda.models.LDA</a>)</em>
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="trlda.models.LDA-class.html">LDA</a></code></b>:
-      <code><a href="trlda.models.LDA-class.html#alpha">alpha</a></code>,
-      <code><a href="trlda.models.LDA-class.html#eta">eta</a></code>,
-      <code><a href="trlda.models.LDA-class.html#lambdas">lambdas</a></code>,
-      <code><a href="trlda.models.LDA-class.html#num_topics">num_topics</a></code>,
-      <code><a href="trlda.models.LDA-class.html#num_words">num_words</a></code>
-      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -195,16 +316,15 @@
   </tr></table>
   
   <p>Updates beliefs over parameters.</p>
-  <p>$$\rho_t = (\tau + t)^{-\kappa},$$</p>
-  <p>where $t$ is the number of calls to this function.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>docs</code></strong> (<code>list</code>) - a batch of documents</li>
         <li><strong class="pname"><code>max_epochs</code></strong> (<code>int</code>) - number of repeated updates to parameters and hyperparameters</li>
-        <li><strong class="pname"><code>max_iter_inference</code></strong> (<code>int</code>) - number of variational inference steps per trust-region step</li>
-        <li><strong class="pname"><code>max_iter_alpha</code></strong> (<code>int</code>) - number of Newton steps applied to $\boldsymbo{\alpha}$</li>
-        <li><strong class="pname"><code>max_iter_eta</code></strong> (<code>int</code>) - number of Newton steps applied to $\eta$</li>
+        <li><strong class="pname"><code>max_iter_inference</code></strong> (<code>int</code>) - number of variational inference steps per iteration</li>
+        <li><strong class="pname"><code>max_iter_alpha</code></strong> (<code>int</code>) - number of Newton steps applied to $\boldsymbo{\alpha}$ per 
+          iteration</li>
+        <li><strong class="pname"><code>max_iter_eta</code></strong> (<code>int</code>) - number of Newton steps applied to $\eta$ per iteration</li>
         <li><strong class="pname"><code>update_lambda</code></strong> (<code>bool</code>) - if <code>False</code>, don't update beliefs over topics, 
           $\boldsymbol{\lambda}$ (default: True)</li>
         <li><strong class="pname"><code>update_alpha</code></strong> (<code>bool</code>) - if True, update $\boldsymbol{\alpha}$ via empirical Bayes 
@@ -213,6 +333,8 @@
         <li><strong class="pname"><code>min_alpha</code></strong> (<code>float</code>) - constrain the $\alpha_k$ to be at least this large (default: 
           1e-6)</li>
         <li><strong class="pname"><code>min_eta</code></strong> (<code>float</code>) - constrain $\eta$ to be at least this large (default: 1e-6)</li>
+        <li><strong class="pname"><code>emp_bayes_threshold</code></strong> (<code>float</code>) - used to stop empirical Bayes updates when parameters don't change
+          (default: 1e-8)</li>
         <li><strong class="pname"><code>verbosity</code></strong> (<code>int</code>) - controls how many messages are printed</li>
     </ul></dd>
   </dl>
@@ -243,14 +365,14 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online latent Dirichlet Allocation</a></th>
+            ><a class="navbar" target="_top" href="https://github.com/lucastheis/trlda">Online Latent Dirichlet Allocation</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Apr 16 00:53:35 2015
+    Generated by Epydoc 3.0.1 on Thu Apr 16 13:40:39 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -4,12 +4,16 @@ This module offers relatively fast implementations of a *trust-region method
 for stochastic variational inference* and related algorithms applied to latent Dirichlet
 allocation. These are realized in the following models:
 
-* `OnlineLDA` (Hoffman et al., 2010; 2013; Theis & Hoffman, 2015)
-* `BatchLDA` (Blei et al., 2013)
-* `CumulativeLDA` (Broderick et al., 2013)
+* [`OnlineLDA`][1] (Hoffman et al., 2010; 2013; Theis & Hoffman, 2015)
+* [`BatchLDA`][2] (Blei et al., 2013)
+* [`CumulativeLDA`][3] (Broderick et al., 2013)
 
 Additional features include adaptive learning rates (Ranganath et al., 2013) and automatic tuning
 of hyperparameters via empirical Bayes.
+
+[1]: http://lucastheis.github.io/trlda/doc/trlda.models.OnlineLDA-class.html
+[2]: http://lucastheis.github.io/trlda/doc/trlda.models.BatchLDA-class.html
+[3]: http://lucastheis.github.io/trlda/doc/trlda.models.CumulativeLDA-class.html
 
 ### Requirements
 

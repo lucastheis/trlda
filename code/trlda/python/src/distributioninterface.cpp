@@ -16,7 +16,9 @@ PyObject* Distribution_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
 
 
 const char* Distribution_doc =
-	"Abstract base class for distributions.\n";
+	"Abstract base class for distributions.\n"
+	"\n"
+	"@undocumented: __new__, __init__";
 
 int Distribution_init(DistributionObject*, PyObject*, PyObject*) {
 	PyErr_SetString(PyExc_NotImplementedError, "This is an abstract class.");

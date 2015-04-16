@@ -19,7 +19,19 @@ using TRLDA::Exception;
 #include "pyutils.h"
 
 const char* CumulativeLDA_doc =
-	"An implementation of SDA for LDA (see Broderick et al., 2013).";
+	"An implementation of SDA for LDA (see Broderick et al., 2013).\n"
+	"\n"
+	"Example:\n"
+	"\n"
+	"	>>> model = CumulativeLDA(num_words=7000, num_topics=100, alpha=.1, eta=.3)\n"
+	"	>>> \n"
+	"	>>> for documents in load_documents('data_train.mat', 1000):\n"
+	"	>>>    model.update_parameters(documents, max_epochs=100)\n"
+	"\n"
+	"In contrast to L{OnlineLDA}, each document should be processed only once by "
+	"L{update_parameters()}.\n"
+	"\n"
+	"@undocumented: __init__, __new__, __reduce__, __setstate__\n";
 
 int CumulativeLDA_init(CumulativeLDAObject* self, PyObject* args, PyObject* kwds) {
 	const char* kwlist[] = {
@@ -73,7 +85,36 @@ int CumulativeLDA_init(CumulativeLDAObject* self, PyObject* args, PyObject* kwds
 
 
 const char* CumulativeLDA_update_parameters_doc =
-	"";
+	"update_parameters(docs, max_epochs=100, max_iter_inference=100, **kwargs)\n"
+	"\n"
+	"Updates beliefs over parameters.\n"
+	"\n"
+	"@type  docs: C{list}\n"
+	"@param docs: a batch of documents\n"
+	"\n"
+	"@type  max_epochs: C{int}\n"
+	"@param max_epochs: number of repeated updates to parameters and hyperparameters\n"
+	"\n"
+	"@type  max_iter_inference: C{int}\n"
+	"@param max_iter_inference: number of variational inference steps per iteration\n"
+	"\n"
+	"@type  max_iter_alpha: C{int}\n"
+	"@param max_iter_alpha: number of Newton steps applied to $\\boldsymbo{\\alpha}$ per iteration\n"
+	"\n"
+	"@type  update_lambda: C{bool}\n"
+	"@param update_lambda: if C{False}, don't update beliefs over topics, $\\boldsymbol{\\lambda}$ (default: True)\n"
+	"\n"
+	"@type  update_alpha: C{bool}\n"
+	"@param update_alpha: if True, update $\\boldsymbol{\\alpha}$ via empirical Bayes (default: False)\n"
+	"\n"
+	"@type  min_alpha: C{float}\n"
+	"@param min_alpha: constrain the $\\alpha_k$ to be at least this large (default: 1e-6)\n"
+	"\n"
+	"@type  emp_bayes_threshold: C{float}\n"
+	"@param emp_bayes_threshold: used to stop empirical Bayes updates when parameters don't change (default: 1e-8)\n"
+	"\n"
+	"@type  verbosity: C{int}\n"
+	"@param verbosity: controls how many messages are printed";
 
 PyObject* CumulativeLDA_update_parameters(
 	CumulativeLDAObject* self,
