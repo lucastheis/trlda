@@ -57,3 +57,9 @@ for epoch in range(10):
 			update_alpha=True,
 			update_eta=True)
 ```
+
+### Reference
+
+L. Theis and M. D. Hoffman  
+*A trust-region method for stochastic variational inference with applications to streaming data*  
+International Conference on Machine Learning, 2015
