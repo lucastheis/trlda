@@ -272,10 +272,10 @@ const char* LDA_update_variables_doc =
 	"Computes beliefs over topic assignments ($z_{di}$) for the given documents.\n"
 	"\n"
 	"The beliefs may be estimated via mean-field variational inference ('VI') "
-	"or collapsed Gibbs sampling ('GIBBS'). The method returns a tuple of a "
-	"$K$-dimensional column vector and a $W \\times K$-dimensional matrix of sufficient "
-	"statistics. In the case of variational inference, the vector represents the Dirichlet "
-	"beliefs over the distribution of topics ($\\boldsymbol{\\theta}$) while for Gibbs sampling it "
+	"or collapsed Gibbs sampling ('GIBBS'). For $N$ documents, the method returns a tuple of a "
+	"$K \\times N$-dimensional matrix and a $W \\times K$-dimensional matrix of sufficient "
+	"statistics. In case of variational inference, each column vector of the $K \\times N$ matrix represents "
+	"Dirichlet beliefs over the distribution of topics ($\\boldsymbol{\\theta}$) while for Gibbs sampling it "
 	"represents a sample of $\\boldsymbol{\\theta}$ conditioned on the sampled topic assignments $\\mathbf{z}$. "
 	"This can be used to initialize the algorithm in a later call to C{update_variables} "
 	"via C{latents}. The matrix of sufficient statistics indicates the expected number of "
@@ -306,7 +306,7 @@ const char* LDA_update_variables_doc =
 	"@param burn_in: number of MCMC updates performed before starting to collect samples\n"
 	"\n"
 	"@rtype: C{tuple}\n"
-	"@return: a tuple of beliefs over $\\boldsymbol{\\theta}$$ and sufficient statistics";
+	"@return: a tuple of beliefs over $\\boldsymbol{\\theta}$ and sufficient statistics";
 
 PyObject* LDA_update_variables(
 	LDAObject* self,
